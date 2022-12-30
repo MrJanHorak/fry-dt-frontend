@@ -1,0 +1,113 @@
+.signup-page {
+  display: flex;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.title-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: flex-start;
+  text-align: center;
+}
+
+.signin-title-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  text-align: center;
+}
+
+.title-container h3 {
+  opacity: 0.5;
+  font-weight: 600;
+}
+
+.avatar-container {
+  width: 100px;
+  height: 100px;
+  border-radius: 100%;
+}
+
+.form-container {
+  width: 65%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 450px;
+}
+
+.sign-in-container {
+  width: 80%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  /* max-width: 450px; */
+}
+
+.QrCode-signin {
+  width: 100%;
+  margin-left: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.form-container input,
+select,
+button {
+  padding: 16px;
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: rgb(255, 255, 255);
+}
+
+.form-container input {
+  border: 1px solid #292934;
+  border-radius: 7px;
+}
+
+.redirect-container {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.5;
+  color: rgb(32, 32, 32);
+}
+
+.redirect-link {
+  color: #7450e9;
+  text-decoration: none;
+  padding-left: 6px;
+}
+
+#avatar-button {
+  border: 1px solid #292934;
+  border-radius: 7px;
+  color: #ffffff;
+  text-align: left;
+}
+
+.submit-button {
+  margin-top: 22px;
+  background: #7450e9;
+  border: none;
+  color: rgb(255, 255, 255);
+  font-weight: 600;
+  border-radius: 7px;
+}
