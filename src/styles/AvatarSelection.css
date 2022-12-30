@@ -1,0 +1,80 @@
+.popup-container {
+  z-index: 100;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 160px;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.popup-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgb(255, 255, 255);
+  border-radius: 8px;
+  min-width: 375px;
+  min-height: 480px;
+  box-sizing: border-box;
+  border: 1px solid #292934;
+  box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.5);
+}
+
+.popup-header {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  justify-content: center;
+  border-bottom: 1px solid #292934;
+  padding: 14px;
+}
+
+.popup-menu img {
+  width: 180px;
+  border: 1px solid #4a4a5a;
+  margin-top: 60px;
+  border-radius: 100%;
+}
+
+.popup-menu select {
+  width: 100%;
+  color: #757575;
+  border: 1px solid #292934;
+  border-radius: 7px;
+  margin-bottom: 14px;
+}
+
+.popup-menu button {
+  background: #7450e9;
+  border: none;
+  color: white;
+  font-weight: 600;
+  border-radius: 7px;
+  width: 100%;
+  margin-bottom: 0px;
+}
+
+.bottom-ui {
+  width: 100%;
+  padding: 14px 14px 20px 14px;
+  margin-top: auto;
+  box-sizing: border-box;
+}
+
+#close-button {
+  margin: 0;
+  width: 8px;
+  height: 8px;
+  background: none;
+  color: lightgrey;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}
