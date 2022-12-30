@@ -1,0 +1,131 @@
+.navOption {
+  text-decoration: none;
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0.5% 1% 0.5% 1%;
+}
+
+.nav-bar a {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0.5% 1% 0.5% 1%;
+  font-size: 14px;
+  text-decoration: none;
+  font-family: "DM Sans", sans-serif;
+}
+
+#logo {
+  margin: 0;
+  display: flex;
+  margin-right: auto;
+  align-items: center;
+}
+
+#logo h3 {
+  font-size: 22px;
+  font-weight: bold;
+  font-family: "DM Sans", sans-serif;
+}
+
+#logo img {
+  height: 35px;
+  margin-right: 8px;
+}
+
+.nav-bar a {
+  display: block;
+  padding: 10px 20px;
+  text-decoration: none;
+  color: #000000;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.nav-bar a:hover {
+  color: rgb(209, 209, 209);
+}
+
+.nav-bar a:focus {
+  color: rgb(41, 70, 199);
+}
+
+/* sidebar Nav */
+
+.menuNav a {
+  display: block;
+  padding: 10px 20px;
+  text-decoration: none;
+  color: #000000;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.logoHolder {
+  display: flex;
+  margin-right: auto;
+  align-items: center;
+}
+
+.logoHolder img {
+  height: 35px;
+  margin: 15px;
+}
+
+.navBar {
+  display: none;
+  position: relative;
+}
+
+.navBar button {
+  position: fixed;
+  left: -5px;
+  top: 0;
+  z-index: 10;
+  background: transparent;
+  border: none;
+}
+
+.menuNav {
+  display: none;
+  overflow-y: scroll;
+  list-style: none;
+  position: fixed;
+  top: 0;
+  background: rgba(113, 117, 117, 0.95);
+  left: -40px;
+  bottom: 0;
+  height: 310px;
+  width: 0;
+  overflow: hidden;
+  max-width: 240px;
+  z-index: 9;
+  border-radius: 12px;
+}
+
+.menuNav.showMenu {
+  width: 100%;
+}
+
+.menuNav li:first-child {
+  margin-top: 3rem;
+}
+
+@media screen and (max-width: 750px) {
+  #nav-bar {
+    display: none;
+  }
+  #hamburger {
+    display: inline;
+  }
+  .menuNav {
+    display: inline;
+  }
+  .navBar {
+    display: inline;
+  }
+}
