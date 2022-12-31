@@ -19,7 +19,7 @@ const SignUp = (props) => {
     name: '',
     email: '',
     password: '',
-    grade: null,
+    grade: 1,
     role: '',
     avatar: robot,
   });
@@ -112,8 +112,7 @@ const SignUp = (props) => {
           >
             Select Avatar
           </button>
-
-          <form>
+          <ul>
             <input
               name='role'
               type='radio'
@@ -133,8 +132,7 @@ const SignUp = (props) => {
             />
 
             <label htmlFor='parent'>Parent</label>
-          </form>
-
+          </ul>
           <button autoComplete='off' id='submit-button' type='submit'>
             SIGN UP
           </button>
