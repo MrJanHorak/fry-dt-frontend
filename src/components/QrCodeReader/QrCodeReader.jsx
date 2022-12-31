@@ -10,8 +10,9 @@ import { login } from "../../services/authService";
 
 
 const ReadQr = ({ handleSignupOrLogin }) => {
+  console.log("I am in the qr reader element!")
   // const CryptoJS = require("crypto-js");
-  const encryptKey = process.env.REACT_APP_ENCRYPTKEY;
+  const encryptKey = import.meta.env.VITE_REACT_APP_ENCRYPTKEY;
   const navigate = useNavigate();
   const [msg, setMsg] = useState("");
   const [showScanner, setShowScanner] = useState(false);
