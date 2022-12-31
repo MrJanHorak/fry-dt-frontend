@@ -3,9 +3,13 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import './App.css';
 
 // Services
-import { getUser, logout } from "../services/authService";
+import { getUser, logout } from "./services/authService";
 
 // Pages + Components
+import Nav from "./components/Nav/Nav";
+import SignUp from "./pages/auth/SignUp";
+import SignIn from "./pages/auth/SignIn";
+import Landing from "./pages/Landing";
 
 const App = () => {
   const navigate = useNavigate();
@@ -35,10 +39,10 @@ const App = () => {
           path='/signup'
           element={<SignUp handleSignupOrLogin={handleSignupOrLogin} />}
         />
-        <Route path='/study' element={<Study user={user} />} />
-        <Route path='/spellingbee' element={<Spellingbee user={user} />} />
+        {/* <Route path='/study' element={<Study user={user} />} />
+        <Route path='/testing' element={<Testing user={user} />} />
         <Route path='/profile' element={<Profile user={user} />} />
-        <Route path='/admin' element={<Admin user={user} />} />
+        <Route path='/admin' element={<Admin user={user} />} /> */}
       </Routes>
     </div>
   );
