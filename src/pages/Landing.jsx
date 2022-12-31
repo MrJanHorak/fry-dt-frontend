@@ -4,7 +4,7 @@ export default function Landing({ user }) {
   return (
     <div id='landing-page'>
       <h2>FRY Word Diagnosis Tool</h2>
-      <img src='./assets/logo/fry-diagnosis-tool.png' alt='logo' />
+      <img src='src/assets/logo/fry-diagnosis-tool.png' alt='logo' />
       <div className='flashcard'>
         <p>
           This tool is designed to help teachers test a students ability to
