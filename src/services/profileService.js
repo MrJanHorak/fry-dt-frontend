@@ -1,5 +1,5 @@
 import * as tokenService from "./tokenService";
-const BASE_URL = "localhost:3000";
+const BASE_URL = "localhost:3000/api/profiles";
 
 export const getProfileById = async (profileId) => {
   if (profileId === null || profileId === undefined) {

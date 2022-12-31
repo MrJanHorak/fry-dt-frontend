@@ -1,5 +1,5 @@
 import * as tokenService from './tokenService';
-const BASE_URL = 'localhost:3000';
+const BASE_URL = 'http://localhost:3000/api/auth';
 
 async function signup(user) {
   try {
