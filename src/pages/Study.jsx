@@ -5,6 +5,7 @@ import words from '../assets/FryWordList.json';
 import { getProfileById } from '../services/profileService';
 
 // Components
+import FlashCard from '../components/FlashCard/FlashCard';
 
 // style
 import '../styles/Study.css';
@@ -53,19 +54,18 @@ function Study({user}) {
     }
     if (click < gradeLevelWords.length) {
     }
-    displayWord = words[click];
+    displayWord = gradeLevelWords[click];
   }
   console.log(gradeLevelWords)
   console.log(words[1][1]);
   return (
     <div id='study-page'>
       <div className='card-holder'>
-        hello
-        {/* <FlashCard
+        <FlashCard
           profile={profile}
           handleClick={handleClick}
           displayWord={displayWord}
-        /> */}
+        />
       </div>
     </div>
   );

@@ -1,0 +1,133 @@
+h1 span {
+  position: relative;
+  animation: move-text-color 0.75s forwards;
+  bottom: -1em;
+  opacity: 0;
+}
+
+@keyframes move-text-color {
+  0% {
+    bottom: 0em;
+    opacity: 1;
+    color: #057cec;
+  }
+
+  /* 50% {
+    bottom: 0.1em;
+    color: #057cec;
+  } */
+
+  100% {
+    bottom: 0;
+    opacity: 1;
+    color: #cb3126;
+  }
+}
+
+.flashcard-container button {
+  width: 130px;
+  height: 45px;
+  margin: 10px;
+  border-radius: 8px;
+  background: #7450e9;
+  border: none;
+  color: rgb(255, 255, 255);
+  font-weight: 600;
+}
+
+#button-container {
+  position: absolute;
+  bottom: 5px;
+}
+
+#word h1 {
+  font-size: 4em;
+}
+
+#letter {
+  color: yellow;
+}
+
+@media (orientation: landscape) {
+  h1 {
+    margin-top: 30px;
+  }
+
+  .flashcard-container {
+    width: 550px;
+    height: 250px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    border: rgb(32, 32, 32) 2px solid;
+    border-radius: 10px;
+  }
+
+  .flashcard-definition {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5px;
+    margin-bottom: 50px;
+  }
+
+  #definition {
+    text-align: center;
+    min-width: 475px;
+    max-width: 475px;
+    min-height: 80px;
+    max-height: 120px;
+    margin-top: 94px;
+  }
+
+  #word {
+    position: absolute;
+    top: 0px;
+    align-self: center;
+  }
+}
+
+@media (orientation: portrait) {
+  h1 {
+    margin-top: 40px;
+  }
+
+  .flashcard-container {
+    width: 350px;
+    height: 350px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 75%;
+    border: rgb(32, 32, 32) 2px solid;
+    border-radius: 10px;
+  }
+
+  .flashcard-definition {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 55px;
+    margin-bottom: 50px;
+  }
+
+  #definition {
+    min-width: 280px;
+    max-width: 280px;
+    min-height: 80px;
+    max-height: 120px;
+    margin-top: 90px;
+  }
+
+  #word {
+    position: absolute;
+    top: 35px;
+    align-self: center;
+  }
+}
