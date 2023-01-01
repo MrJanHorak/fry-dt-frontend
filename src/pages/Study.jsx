@@ -1,14 +1,74 @@
-import React from 'react'
-import words from '../assets/FryWordList.json'
+import React, {useState, useEffect} from 'react';
+import words from '../assets/FryWordList.json';
 
-function Study() {
+// Services
+import { getProfileById } from '../services/profileService';
 
-  console.log(words)
+// Components
+
+// style
+import '../styles/Study.css';
+
+function Study({user}) {
+  const [gradeLevelWords, setgradeLevelWords] = useState();
+  const [click, setClick] = useState(0);
+  const [profile, setProfile] = useState();
+
+  let displayWord = [];
+  let studyList = [];
+
+  const handleClick = (e) => {
+    setClick(click + 1);
+  };
+
+  useEffect(() => {
+    const getProfile = async () => {
+      try {
+        const profileData = await getProfileById(user.profile);
+        setProfile(profileData);
+      } catch (error) {
+        throw error;
+      }
+    };
+    getProfile();
+  }, [user.profile]);
+
+
+  useEffect(() => {
+    if (profile?.grade) {
+      console.log(profile.grade)
+      for (const key in words){
+        if (key <= (profile.grade*100)){
+          studyList.push(words[key][1])
+        }
+        setgradeLevelWords(studyList);
+      }
+    }
+  }, [profile, user.profile]);
+
+  if (gradeLevelWords) {
+    if (click >= gradeLevelWords.length) {
+      displayWord = [];
+      setClick(0);
+    }
+    if (click < gradeLevelWords.length) {
+    }
+    displayWord = words[click];
+  }
+  console.log(gradeLevelWords)
+  console.log(words[1][1]);
   return (
-    <div>
-      STUDY PAGE
+    <div id='study-page'>
+      <div className='card-holder'>
+        hello
+        {/* <FlashCard
+          profile={profile}
+          handleClick={handleClick}
+          displayWord={displayWord}
+        /> */}
+      </div>
     </div>
-  )
+  );
 }
 
-export default Study
+export default Study;
