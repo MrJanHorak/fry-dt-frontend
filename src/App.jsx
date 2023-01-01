@@ -10,6 +10,9 @@ import Nav from "./components/Nav/Nav";
 import SignUp from "./pages/auth/SignUp";
 import SignIn from "./pages/auth/SignIn";
 import Landing from "./pages/Landing";
+import Testing from './pages/Testing';
+import Study from './pages/Study';
+import Profile from './pages/Profile';
 
 const App = () => {
   const navigate = useNavigate();
@@ -39,10 +42,10 @@ const App = () => {
           path='/signup'
           element={<SignUp handleSignupOrLogin={handleSignupOrLogin} />}
         />
-        {/* <Route path='/study' element={<Study user={user} />} />
+        <Route path='/study' element={<Study user={user} />} />
         <Route path='/testing' element={<Testing user={user} />} />
         <Route path='/profile' element={<Profile user={user} />} />
-        <Route path='/admin' element={<Admin user={user} />} /> */}
+        {/* <Route path='/admin' element={<Admin user={user} />} /> */}
       </Routes>
     </div>
   );
