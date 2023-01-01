@@ -12,21 +12,21 @@ const FlashCard = ({ profile, handleClick, displayWord }) => {
   let toSpell = [];
 
   const spellWord = (e) => {
-    // toSpell = displayWord.word.split("");
-    // let time = (toSpell.length * 1000  +  1000 )/ (profile.rate);
+    toSpell = displayWord.split("");
+    let time = (toSpell.length * 1000  +  1000 )/ (profile.rate);
 
-    // setTimeout(() => {
-    //   setSpeaking(false);
-    // }, [time]);
+    setTimeout(() => {
+      setSpeaking(false);
+    }, [time]);
     setSpeaking(true);
-    // toSpell.forEach((letter) => {
+    toSpell.forEach((letter) => {
       speak({
-        text: displayWord,
+        text: letter,
         voice: voices[profile.voice],
         rate: profile.rate,
         pitch: profile.pitch,
       });
-    // });
+    });
   };
 
   return displayWord ? (
