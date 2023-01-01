@@ -1,19 +1,18 @@
-import React, { useState } from "react";
-import { useSpeechSynthesis } from "react-speech-kit";
+import React, { useEffect, useState, useTimeout } from 'react';
+import { useSpeechSynthesis } from 'react-speech-kit';
 
-import "../../styles/FlashCard.css";
-import SplitText from "./SplitText";
+import '../../styles/FlashCard.css';
+import SplitText from './SplitText';
 
 const FlashCard = ({ profile, handleClick, displayWord }) => {
-
   const [speaking, setSpeaking] = useState(false);
   const { speak, voices } = useSpeechSynthesis();
 
   let toSpell = [];
 
   const spellWord = (e) => {
-    toSpell = displayWord.split("");
-    let time = (toSpell.length * 1000  +  1000 )/ (profile.rate);
+    toSpell = displayWord.split('');
+    let time = (toSpell.length * 1000 + 1000) / profile.rate;
 
     setTimeout(() => {
       setSpeaking(false);
@@ -29,25 +28,45 @@ const FlashCard = ({ profile, handleClick, displayWord }) => {
     });
   };
 
+  useEffect(() => {
+    const timedSpeaking = setTimeout(() => {
+      console.log('I SHOULD BE SAYING SOMETHING!');
+      setSpeaking(true);
+      speak({
+        text: displayWord,
+        // voice: voices[profile.voice],
+        // rate: profile.rate,
+        // pitch: profile.pitch,
+      });
+      setSpeaking(false);
+    }, 5000);
+    return () => clearTimeout(timedSpeaking);
+  }, [displayWord]);
+
   return displayWord ? (
-    <div className="flashcard-container">
-      <div className="flashcard-definition">
-        <div id="word">
+    <div className='flashcard-container'>
+      <div className='flashcard-definition'>
+        <div id='word'>
           {speaking ? (
             <h1>
-              <SplitText rate={profile.rate} displayWord={displayWord} role={"heading"} />{" "}
+              <SplitText
+                rate={profile.rate}
+                displayWord={displayWord}
+                role={'heading'}
+              />{' '}
             </h1>
           ) : (
             <h1> {displayWord} </h1>
           )}
         </div>
-        
-        <div id="button-container">
+
+        <div id='button-container'>
           <button
             {...(!speaking
               ? {
                   onClick: () => {
                     handleClick();
+                    // sayWord()
                   },
                 }
               : {})}
@@ -60,10 +79,10 @@ const FlashCard = ({ profile, handleClick, displayWord }) => {
                   onClick: () => {
                     speak({
                       text: displayWord,
-                      // voice: voices[profile.voice],
-                      // rate: profile.rate,
-                      // pitch: profile.pitch,
-                    });;
+                      voice: voices[profile.voice],
+                      rate: profile.rate,
+                      pitch: profile.pitch,
+                    });
                   },
                 }
               : {})}

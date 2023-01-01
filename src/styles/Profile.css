@@ -1,0 +1,245 @@
+.avatar-container {
+  width: 100px;
+  height: 100px;
+  border-radius: 100%;
+}
+
+#profile-page {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+#profile-card button:hover {
+  background: blue;
+}
+
+#profile-card button:active {
+  background: red;
+}
+
+#profile-pic {
+  width: 150px;
+  position: relative;
+  margin: 8px;
+}
+
+#voice-setting p {
+  margin-left: 12px;
+  text-align: left;
+}
+
+#voice-setting select {
+  padding: 0;
+  color: black;
+  font-family: inherit;
+  margin-left: 5px;
+}
+
+#voice-setting button {
+  align-self: center;
+  background: #7450e9;
+  border: none;
+  color: white;
+  font-weight: 600;
+  text-align: center;
+  padding: 7px;
+  margin-left: 8px;
+  margin-top: 16px;
+  border-radius: 12px;
+  height: 45px;
+  width: 150px;
+}
+
+.Collapsible {
+  border: 2px solid black;
+  /* padding: 12px; */
+  width: 100%;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  margin: 12px 0 0 0;
+}
+
+.Collapsible__trigger {
+  display: block;
+  font-weight: 400;
+  text-decoration: none;
+  position: relative;
+  padding: 10px;
+}
+
+.Collapsible__trigger:after {
+  font-family: "FontAwesome";
+  content: "\f107";
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  display: block;
+  transition: transform 300ms;
+}
+.Collapsible__trigger.is-open:after {
+  transform: rotateZ(180deg);
+}
+
+.Collapsible__trigger.is-disabled {
+  opacity: 0.5;
+  background-color: grey;
+}
+
+#user-students{
+  padding: 0;
+  border: 3px solid blue;
+}
+
+.qr-code-generation-form{
+  align-items: center;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.qr-code-generation-form button{
+  margin-top: 0;
+  width: 150px;
+}
+
+#generateQr{
+  width: 250px;
+  padding: 16px;
+  font-size: 16px;
+  margin-bottom: 16px;
+  margin-right: 5px;
+  border: 1px solid #292934;
+  border-radius: 7px;
+}
+
+@media (orientation: portrait) {
+  select {
+    width: 90%;
+  }
+
+  select option {
+    width: 90%;
+  }
+
+  .profile-info {
+    width: 350px;
+    align-items: center;
+    margin-left: 35px;
+    margin-top: 50px;
+  }
+
+  .word-stats {
+    width: 85%;
+    margin-left: 15px;
+  }
+
+  #profile-card {
+    border: 2px solid black;
+    padding: 12px;
+    width: 85%;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+
+  #profile-card button {
+    background: #7450e9;
+    border: none;
+    color: white;
+    font-weight: 600;
+    text-align: center;
+    padding: 7px;
+    margin: 4px;
+    border-radius: 12px;
+    height: 45px;
+    width: 150px;
+  }
+
+  #voice-setting {
+    width: 85%;
+    padding: 12px;
+    margin-top: 1em;
+    margin-bottom: 0.3em;
+    text-align: center;
+  }
+
+  .Collapsible {
+    width: 320px;
+    }
+}
+
+@media (orientation: landscape) {
+  /* .word-stats {
+    width: 111%; 
+    margin-left: -17px;
+  } */
+
+  #profile-card {
+    margin-top: 10px;
+    border: 2px solid black;
+    padding: 12px;
+    height: 250px;
+    border-radius: 12px;
+    display: grid;
+    grid-template-rows: 70% 30%;
+    grid-template-columns: 40% 60%;
+    grid-template-areas:
+      "main bio"
+      "button contact";
+  }
+
+  #profil-image {
+    grid-area: main;
+  }
+
+  #bio-info {
+    grid-area: bio;
+  }
+
+  #update-avatar {
+    grid-area: button;
+  }
+  #update-avatar button {
+    margin-top: 16px;
+  }
+
+  #user-email {
+    grid-area: contact;
+  }
+  #user-email h3 {
+    margin-top: 10px;
+  }
+
+  #profile-card button {
+    background: #7450e9;
+    border: none;
+    color: white;
+    font-weight: 600;
+    text-align: center;
+    padding: 7px;
+    margin-left: 8px;
+    margin-top: 16px;
+    border-radius: 12px;
+    height: 45px;
+    width: 150px;
+  }
+
+  #voice-setting {
+    /* border: 2px solid black;
+    border-radius: 12px;
+    width: 100%; */
+    padding: 12px;
+    margin-top: 1em;
+    margin-bottom: 0.3em;
+    text-align: center;
+  }
+
+
+}

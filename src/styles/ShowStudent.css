@@ -1,0 +1,29 @@
+/* .student-container {
+  border: 2px solid black;
+  padding: 12px;
+  width: 100%;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: row;
+  align-content: space-around;
+  justify-content: center;
+  margin: 12px 0 0 0;
+} */
+
+/* .student-name{
+  margin: 10px;
+  width: 100px;
+} */
+
+#student-profile-pic{
+  margin-top: 8px;
+  margin-right: 10px;
+  width: 35px;
+  height: 35px;
+}
+
+.student-collapsable-title{
+  display: flex;
+  vertical-align: middle;
+}
+

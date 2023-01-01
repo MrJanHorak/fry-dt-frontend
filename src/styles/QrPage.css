@@ -1,0 +1,29 @@
+.qr-card-page{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.qr-card{
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  margin: 20px;
+}
+
+.qr-card-header{
+  width: 350px;
+  height: 45px;
+  background-color: aqua;
+}
+
+.qr-code-field{
+  width:325px;
+
+}
+.qr-code-footer{
+  width: 350px;
+  height: 45px;
+  background-color: aqua;
+  color: black;
+}

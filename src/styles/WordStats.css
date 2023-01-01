@@ -1,0 +1,113 @@
+@media (orientation: portrait) {
+  .practiced-words {
+    border: 2px solid black;
+    width: 95%;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    margin-top: 7px;
+    margin-bottom: 7px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #stats-container {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (orientation: landscape) {
+  .practiced-words {
+    border: 2px solid black;
+    padding: 12px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    margin-top: 7px;
+    margin-bottom: 7px;
+    justify-content: center;
+    align-items: center;
+    width: 75%;
+  }
+
+  #stats-container {
+    display: flex;
+    text-align: center;
+  }
+}
+
+progress {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+progress {
+  background-color: rgb(194, 194, 194);
+  border-radius: 7px;
+}
+
+progress::-webkit-progress-bar {
+  background-color: rgb(194, 194, 194);
+  border-radius: 7px;
+}
+
+.spelled-correctly-progressBar progress::-webkit-progress-value {
+  background-color: rgb(37, 168, 114);
+  border-radius: 7px;
+  box-shadow: 1px 1px 5px 3px rgba(34, 34, 34, 0.8);
+  content: attr(value);
+}
+
+.spelled-correctly-progressBar progress::-moz-progress-bar {
+  background-color: rgb(37, 168, 114);
+  border-radius: 7px;
+  box-shadow: 1px 1px 5px 3px rgba(34, 34, 34, 0.8);
+  content: attr(value);
+}
+
+.spelled-correctly-progressBar-none progress::-moz-progress-bar {
+  background-color: rgb(37, 168, 114);
+  border-radius: 7px;
+  content: attr(value);
+}
+
+.spelled-incorrectly-progressBar progress::-webkit-progress-value {
+  background-color: rgb(168, 37, 37);
+  border-radius: 7px;
+  box-shadow: 1px 1px 5px 3px rgba(34, 34, 34, 0.8);
+  content: attr(value);
+}
+
+.spelled-incorrectly-progressBar-none progress::-webkit-progress-value {
+  background-color: rgb(168, 37, 37);
+  border-radius: 7px;
+  content: attr(value);
+}
+
+.spelled-incorrectly-progressBar progress::-moz-progress-bar {
+  background-color: rgb(168, 37, 37);
+  border-radius: 7px;
+  box-shadow: 1px 1px 5px 3px rgba(34, 34, 34, 0.8);
+  content: attr(value);
+}
+
+.spelled-correctly-progressBar {
+  margin-right: 10px;
+}
+.spelled-incorrectly-progressBar {
+  margin-left: 10px;
+}
+
+#word-stats {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
