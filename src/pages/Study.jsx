@@ -37,7 +37,6 @@ function Study({user}) {
 
   useEffect(() => {
     if (profile?.grade) {
-      console.log(profile.grade)
       for (const key in words){
         if (key <= (profile.grade*100)){
           studyList.push(words[key][1])
@@ -56,8 +55,7 @@ function Study({user}) {
     }
     displayWord = gradeLevelWords[click];
   }
-  console.log(gradeLevelWords)
-  console.log(words[1][1]);
+
   return (
     <div id='study-page'>
       <div className='card-holder'>

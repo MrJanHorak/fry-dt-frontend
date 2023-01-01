@@ -5,7 +5,7 @@ import "../../styles/FlashCard.css";
 import SplitText from "./SplitText";
 
 const FlashCard = ({ profile, handleClick, displayWord }) => {
-  console.log(displayWord)
+
   const [speaking, setSpeaking] = useState(false);
   const { speak, voices } = useSpeechSynthesis();
 
