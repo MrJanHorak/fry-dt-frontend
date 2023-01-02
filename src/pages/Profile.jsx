@@ -17,7 +17,8 @@ import CryptoJS from 'crypto-js';
 
 const Profile = ({ user }) => {
   // const CryptoJS = require('crypto-js');
-  const encryptKey = process.env.VITE_REACT_APP_ENCRYPTKEY;
+  // const encryptKey = process.env.VITE_REACT_APP_ENCRYPTKEY;
+  const encryptKey = import.meta.env.VITE_REACT_APP_ENCRYPTKEY;
   const [userProfile, setUserProfile] = useState();
   const [popup, setPopup] = useState(false);
   const [click, setClick] = useState(false);
