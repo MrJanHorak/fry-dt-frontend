@@ -11,6 +11,7 @@ const CreateQr = ({ user, pw }) => {
       CryptoJS.AES.encrypt(JSON.stringify(student.name), encryptKey).toString(),
       pw,
     ].join(',');
+
     return (
       <div
         key={student._id}
@@ -36,7 +37,7 @@ const CreateQr = ({ user, pw }) => {
           }}
           className='qr-card-header'
         >
-          <h2>Spelling Bee Practice</h2>
+          <h2>FRY Diagnosis Tool</h2>
         </div>
         <div style={{ padding: 20 }} className='qr-code-field'>
           <QRCode value={qrValue} />

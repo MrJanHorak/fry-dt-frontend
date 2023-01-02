@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Collapsible from 'react-collapsible';
+import NewWindow from 'react-new-window';
+
 import '../styles/Profile.css';
 
 //services
@@ -16,8 +18,6 @@ import CreateQr from '../components/CreateQr/CreateQr';
 import CryptoJS from 'crypto-js';
 
 const Profile = ({ user }) => {
-  // const CryptoJS = require('crypto-js');
-  // const encryptKey = process.env.VITE_REACT_APP_ENCRYPTKEY;
   const encryptKey = import.meta.env.VITE_REACT_APP_ENCRYPTKEY;
   const [userProfile, setUserProfile] = useState();
   const [popup, setPopup] = useState(false);
@@ -83,36 +83,6 @@ const Profile = ({ user }) => {
     setQr(CryptoJS.AES.encrypt(JSON.stringify(value), encryptKey).toString());
   };
 
-  const RenderInWindow = (props) => {
-    const [container, setContainer] = useState(null);
-    const newWindow = useRef(window);
-
-    useEffect(() => {
-      const div = document.createElement('div');
-      setContainer(div);
-    }, []);
-
-    useEffect(() => {
-      if (container) {
-        newWindow.current = window.open(
-          '',
-          '',
-          'width=738,height=526,left=200,top=200'
-        );
-        newWindow.current.document.body.appendChild(container);
-        const curWindow = newWindow.current;
-        var uri = window.location.toString();
-        if (uri.indexOf('?') > 0) {
-          var clean_uri = uri.substring(0, uri.indexOf('?'));
-          window.history.replaceState({}, document.title, clean_uri);
-        }
-        return () => curWindow.close();
-      }
-    }, [container]);
-
-    return container && createPortal(props.children, container);
-  };
-
   return (
     <>
       {userProfile && (
@@ -166,6 +136,7 @@ const Profile = ({ user }) => {
               <>
                 <Collapsible trigger='Create QR-Codes'>
                   <div className='generate-QrCodes qr-code-generation-form'>
+                    <form className='qr-code-generation-form'>
                     <label htmlFor='generateQr'>
                       Please enter your password:
                     </label>
@@ -177,7 +148,6 @@ const Profile = ({ user }) => {
                       id='generateQr'
                       onChange={handleQrChange}
                     />
-                    <form className='qr-code-generation-form'>
                       <button
                         type='submit'
                         className='submit-button'
@@ -188,9 +158,9 @@ const Profile = ({ user }) => {
                         create
                       </button>
                       {open && (
-                        <RenderInWindow>
+                        <NewWindow>
                           <CreateQr user={userProfile} pw={qr} />
-                        </RenderInWindow>
+                        </NewWindow>
                       )}
                     </form>
                   </div>
