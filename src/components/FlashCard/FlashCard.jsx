@@ -3,13 +3,13 @@ import { useSpeechSynthesis } from 'react-speech-kit';
 
 import '../../styles/FlashCard.css';
 
-const FlashCard = ({ profile, handleClick, displayWord }) => {
+const FlashCard = ({ profile, handleClick, handleBack, displayWord }) => {
   const [speaking, setSpeaking] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(true);
   const { speak, voices } = useSpeechSynthesis();
 
   useEffect(() => {
-    setButtonDisabled(true)
+    setButtonDisabled(true);
     const timedSpeaking = setTimeout(() => {
       setSpeaking(true);
       speak({
@@ -19,7 +19,7 @@ const FlashCard = ({ profile, handleClick, displayWord }) => {
         pitch: profile.pitch,
       });
       setSpeaking(false);
-      setButtonDisabled(false)
+      setButtonDisabled(false);
     }, 5000);
     return () => clearTimeout(timedSpeaking);
   }, [displayWord]);
@@ -28,21 +28,23 @@ const FlashCard = ({ profile, handleClick, displayWord }) => {
     <div className='flashcard-container'>
       <div className='flashcard-definition'>
         <div id='word'>
-          {speaking ? (
-            <h1>
-              <SplitText
-                rate={profile.rate}
-                displayWord={displayWord}
-                role={'heading'}
-              />{' '}
-            </h1>
-          ) : (
-            <h1> {displayWord} </h1>
-          )}
+          <h1> {displayWord} </h1>
         </div>
 
         <div id='button-container'>
-          <button disabled={buttonDisabled}
+        <button
+            {...(!speaking
+              ? {
+                  onClick: () => {
+                    handleBack();
+                  },
+                }
+              : {})}
+          >
+            BACK
+          </button>
+          <button
+            disabled={buttonDisabled}
             {...(!speaking
               ? {
                   onClick: () => {

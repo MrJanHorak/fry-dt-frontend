@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import words from '../assets/FryWordList.json';
 
 // Services
@@ -10,7 +10,7 @@ import FlashCard from '../components/FlashCard/FlashCard';
 // style
 import '../styles/Study.css';
 
-function Study({user}) {
+function Study({ user }) {
   const [gradeLevelWords, setgradeLevelWords] = useState();
   const [click, setClick] = useState(0);
   const [profile, setProfile] = useState();
@@ -20,6 +20,9 @@ function Study({user}) {
 
   const handleClick = (e) => {
     setClick(click + 1);
+  };
+  const handleBack = (e) => {
+    click === 0 ? setClick(gradeLevelWords.length - 1) : setClick(click - 1);
   };
 
   useEffect(() => {
@@ -34,12 +37,11 @@ function Study({user}) {
     getProfile();
   }, [user.profile]);
 
-
   useEffect(() => {
     if (profile?.grade) {
-      for (const key in words){
-        if (key <= (profile.grade*100)){
-          studyList.push(words[key][1])
+      for (const key in words) {
+        if (key <= profile.grade * 100) {
+          studyList.push(words[key][1]);
         }
         setgradeLevelWords(studyList);
       }
@@ -62,6 +64,7 @@ function Study({user}) {
         <FlashCard
           profile={profile}
           handleClick={handleClick}
+          handleBack={handleBack}
           displayWord={displayWord}
         />
       </div>

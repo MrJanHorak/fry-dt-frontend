@@ -4,7 +4,6 @@ import '../../styles/QrPage.css';
 import CryptoJS from 'crypto-js';
 
 const CreateQr = ({ user, pw }) => {
-  // const CryptoJS = require("crypto-js");
   const encryptKey = import.meta.env.VITE_REACT_APP_ENCRYPTKEY;
   const qrCard = user.students.map((student) => {
     let qrValue = [
