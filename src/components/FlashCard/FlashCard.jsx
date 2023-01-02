@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useTimeout } from 'react';
 import { useSpeechSynthesis } from 'react-speech-kit';
+import { RiUserVoiceFill } from 'react-icons/ri';
+import { IoArrowBack, IoArrowForward } from 'react-icons/io5';
 
 import '../../styles/FlashCard.css';
 
@@ -32,7 +34,7 @@ const FlashCard = ({ profile, handleClick, handleBack, displayWord }) => {
         </div>
 
         <div id='button-container'>
-        <button
+          <button
             {...(!speaking
               ? {
                   onClick: () => {
@@ -41,7 +43,7 @@ const FlashCard = ({ profile, handleClick, handleBack, displayWord }) => {
                 }
               : {})}
           >
-            BACK
+            <IoArrowBack />
           </button>
           <button
             disabled={buttonDisabled}
@@ -58,7 +60,7 @@ const FlashCard = ({ profile, handleClick, handleBack, displayWord }) => {
                 }
               : {})}
           >
-            PRONOUNCE
+            <RiUserVoiceFill />
           </button>
           <button
             {...(!speaking
@@ -69,7 +71,7 @@ const FlashCard = ({ profile, handleClick, handleBack, displayWord }) => {
                 }
               : {})}
           >
-            NEXT
+            <IoArrowForward />
           </button>
         </div>
       </div>
