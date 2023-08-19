@@ -1,9 +1,15 @@
-import React from 'react'
+import TestRoom from '../components/TestRoom/TestRoom'
 
-function Testing() {
+function Testing({ username, setUsername, room, setRoom, socket }) {
   return (
     <div>
-      TESTING
+      <TestRoom
+        username={username}
+        setUsername={setUsername}
+        room={room}
+        setRoom={setRoom}
+        socket={socket}
+      />
     </div>
   )
 }

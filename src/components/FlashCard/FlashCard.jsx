@@ -22,7 +22,7 @@ const FlashCard = ({ profile, handleClick, handleBack, displayWord }) => {
       });
       setSpeaking(false);
       setButtonDisabled(false);
-    }, 5000);
+    }, 4000);
     return () => clearTimeout(timedSpeaking);
   }, [displayWord]);
 
