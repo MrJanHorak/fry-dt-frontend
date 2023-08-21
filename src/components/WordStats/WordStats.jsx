@@ -1,30 +1,30 @@
-import React from "react";
-import "../../styles/WordStats.css";
+import React from 'react'
+import '../../styles/WordStats.css'
 
 const WordStats = ({ userProfile }) => {
   const words = userProfile.practicedWords.map((word) => {
     let correctPercent = (
       (word.timesCorrect / word.timesPracticed) *
       100
-    ).toFixed(2);
+    ).toFixed(2)
     let incorrectPercent = (
       (word.timesIncorrect / word.timesPracticed) *
       100
-    ).toFixed(2);
-
+    ).toFixed(2)
+    console.log(userProfile)
     return (
       <div key={word._id} className="practiced-words">
         <h2>{word.word}</h2>
         <p>
           <b>Times Practiced: </b>
-          {word.timesPracticed}{" "}
+          {word.timesPracticed}{' '}
         </p>
         <div id="stats-container">
           <div
             className={
               correctPercent > 0
-                ? "spelled-correctly-progressBar"
-                : "spelled-correctly-progressBar-none"
+                ? 'spelled-correctly-progressBar'
+                : 'spelled-correctly-progressBar-none'
             }
           >
             <p>
@@ -42,8 +42,8 @@ const WordStats = ({ userProfile }) => {
           <div
             className={
               incorrectPercent > 0
-                ? "spelled-incorrectly-progressBar"
-                : "spelled-incorrectly-progressBar-none"
+                ? 'spelled-incorrectly-progressBar'
+                : 'spelled-incorrectly-progressBar-none'
             }
           >
             <p>
@@ -58,11 +58,11 @@ const WordStats = ({ userProfile }) => {
             </p>
           </div>
         </div>
-        <b>wrong attemps: </b>
-        {word.recordOfWrongs.join(", ")}
+        <b>wrong attempts: </b>
+        {word.recordOfWrongs.join(', ')}
       </div>
-    );
-  });
+    )
+  })
 
   return (
     <>
@@ -73,12 +73,12 @@ const WordStats = ({ userProfile }) => {
       )}
       {userProfile.practicedWords !== [] && (
         <div id="word-stats">
-          <h2>Total Practiced Words: {userProfile.practicedWords.length}</h2>
+          <h3>Total Practiced Words: {userProfile.practicedWords.length}</h3>
           {words}
         </div>
       )}
     </>
-  );
-};
+  )
+}
 
-export default WordStats;
+export default WordStats

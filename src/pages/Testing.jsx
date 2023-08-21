@@ -1,10 +1,11 @@
 import TestRoom from '../components/TestRoom/TestRoom'
 
-function Testing({ username, setUsername, room, setRoom, socket }) {
+function Testing({ user, username, setUsername, room, setRoom, socket }) {
+  console.log(user)
   return (
     <div>
       <TestRoom
-        username={username}
+        username={user.name}
         setUsername={setUsername}
         room={room}
         setRoom={setRoom}

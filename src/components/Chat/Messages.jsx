@@ -2,7 +2,7 @@ import styles from './styles.module.css';
 import { useState, useEffect, useRef } from 'react';
 
 const Messages = ({ socket }) => {
-  const [messagesRecieved, setMessagesReceived] = useState([]);
+  const [messagesReceived, setMessagesReceived] = useState([]);
 
   const messagesColumnRef = useRef(null);
 
@@ -41,7 +41,7 @@ const Messages = ({ socket }) => {
   useEffect(() => {
     messagesColumnRef.current.scrollTop =
       messagesColumnRef.current.scrollHeight;
-  }, [messagesRecieved]);
+  }, [messagesReceived]);
 
   function sortMessagesByDate(messages) {
     return messages.sort(
@@ -57,7 +57,7 @@ const Messages = ({ socket }) => {
 
   return (
     <div className={styles.messagesColumn} ref={messagesColumnRef}>
-      {messagesRecieved.map((msg, i) => (
+      {messagesReceived.map((msg, i) => (
         <div className={styles.message} key={i}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span className={styles.msgMeta}>{msg.username}</span>

@@ -174,7 +174,7 @@ const Profile = ({ user }) => {
                     )
                   }
                 >
-                  <div className='indexChilden'>
+                  <div className='indexChildren'>
                     <ShowStudents user={userProfile} />
                   </div>
                   <div className='addChild'>

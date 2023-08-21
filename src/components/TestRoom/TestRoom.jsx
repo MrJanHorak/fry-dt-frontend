@@ -15,10 +15,10 @@ const TestRoom = ({ username, setUsername, room, setRoom, socket }) => {
   return (
     <div className={styles.container}>
       <div className={styles.formContainer}>
-        <h1>{`<>DevRooms</>`}</h1>
+        <h1>{`Testing Center`}</h1>
         <input
           className={styles.input}
-          placeholder="Username..."
+          placeholder={username}
           onChange={(e) => setUsername(e.target.value)}
         />
 
@@ -38,7 +38,7 @@ const TestRoom = ({ username, setUsername, room, setRoom, socket }) => {
           style={{ width: '100%' }}
           onClick={joinRoom}
         >
-          Join Room
+          Ready
         </button>
       </div>
     </div>

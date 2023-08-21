@@ -22,7 +22,7 @@
   height: 35px;
 }
 
-.student-collapsable-title{
+.student-collapsible-title{
   display: flex;
   vertical-align: middle;
 }
