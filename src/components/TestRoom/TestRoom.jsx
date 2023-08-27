@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 import styles from './styles.module.css'
+import { useEffect } from 'react'
 
-const TestRoom = ({ user,  room, setRoom, socket }) => {
+const TestRoom = ({ user, room, setRoom, socket }) => {
+  
   console.log(user)
   const navigate = useNavigate()
   let username = user.name
@@ -17,7 +19,6 @@ const TestRoom = ({ user,  room, setRoom, socket }) => {
     <div className={styles.container}>
       <div className={styles.formContainer}>
         <h1>{`Testing Center`}</h1>
-      
 
         <select
           className={styles.input}

@@ -1,3 +1,9 @@
+button {
+  color: rgb(230, 244, 40);
+  font-weight: 400;
+  background-color: chocolate;
+  border-radius: 15%;
+}
 .chatContainer {
   max-width: 1100px;
   margin: 0 auto;
