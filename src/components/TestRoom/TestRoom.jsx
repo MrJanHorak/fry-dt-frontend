@@ -1,13 +1,14 @@
 import { useNavigate } from 'react-router-dom'
 import styles from './styles.module.css'
 
-const TestRoom = ({ username, setUsername, room, setRoom, socket }) => {
+const TestRoom = ({ user,  room, setRoom, socket }) => {
+  console.log(user)
   const navigate = useNavigate()
+  let username = user.name
   const joinRoom = () => {
     if (room !== '' && username !== '') {
-      socket.emit('join_room', { username, room })
+      socket.emit('join_room', { username, user, room })
     }
-
     // Redirect to /chat
     navigate('/chat', { replace: true })
   }
@@ -16,21 +17,15 @@ const TestRoom = ({ username, setUsername, room, setRoom, socket }) => {
     <div className={styles.container}>
       <div className={styles.formContainer}>
         <h1>{`Testing Center`}</h1>
-        <input
-          className={styles.input}
-          placeholder={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
+      
 
         <select
           className={styles.input}
           onChange={(e) => setRoom(e.target.value)}
         >
           <option>-- Select Room --</option>
-          <option value="javascript">JavaScript</option>
-          <option value="node">Node</option>
-          <option value="express">Express</option>
-          <option value="react">React</option>
+          <option value="waiting">waiting room</option>
+          <option value="testing">testing</option>
         </select>
 
         <button

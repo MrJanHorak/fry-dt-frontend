@@ -66,12 +66,12 @@ const WordStats = ({ userProfile }) => {
 
   return (
     <>
-      {userProfile.practicedWords === [] && (
+      {userProfile.practicedWords.length === 0 && (
         <div>
           <h2>Loading ...</h2>
         </div>
       )}
-      {userProfile.practicedWords !== [] && (
+      {userProfile.practicedWords.length && (
         <div id="word-stats">
           <h3>Total Practiced Words: {userProfile.practicedWords.length}</h3>
           {words}

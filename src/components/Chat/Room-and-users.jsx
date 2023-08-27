@@ -2,7 +2,7 @@ import styles from './styles.module.css';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const RoomAndUsers = ({ socket, username, room }) => {
+const RoomAndUsers = ({ socket, username, user, room }) => {
   const [roomUsers, setRoomUsers] = useState([]);
 
   const navigate = useNavigate();
@@ -34,6 +34,7 @@ const RoomAndUsers = ({ socket, username, room }) => {
             <li
               style={{
                 fontWeight: `${user.username === username ? 'bold' : 'normal'}`,
+                color: `${user.user.role === 'teacher' ? 'red' : 'black'}`,
               }}
               key={user.id}
             >

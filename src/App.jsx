@@ -64,7 +64,7 @@ const App = () => {
         />
         <Route
           path="/chat"
-          element={<Chat username={username} room={room} socket={socket} />}
+          element={<Chat user={user} username={username} room={room} socket={socket} />}
         />
         <Route path="/profile" element={<Profile user={user} />} />
 

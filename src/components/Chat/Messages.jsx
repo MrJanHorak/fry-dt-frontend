@@ -15,6 +15,7 @@ const Messages = ({ socket }) => {
         {
           message: data.message,
           username: data.username,
+          userRole: data.userRole,
           __createdtime__: data.__createdtime__,
         },
       ]);
@@ -58,8 +59,12 @@ const Messages = ({ socket }) => {
   return (
     <div className={styles.messagesColumn} ref={messagesColumnRef}>
       {messagesReceived.map((msg, i) => (
-        <div className={styles.message} key={i}>
+        <div className={styles.message} style={{
+          
+          backgroundColor: `${msg.userRole === 'teacher' ? 'darkblue' : 'green'}`,
+        }} key={i}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span className={styles.msgMeta}>{msg.userRole}</span>
             <span className={styles.msgMeta}>{msg.username}</span>
             <span className={styles.msgMeta}>
               {formatDateFromTimestamp(msg.__createdtime__)}
