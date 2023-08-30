@@ -2,15 +2,15 @@ import styles from './styles.module.css';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const RoomAndUsers = ({ socket, username, user, room }) => {
-  const [roomUsers, setRoomUsers] = useState([]);
+const RoomAndUsers = ({ socket, username, user, setRoomUsers, room }) => {
+  const [roomUsers, setRoomUrs] = useState([]);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     socket.on('chatroom_users', (data) => {
-      console.log(data);
-      setRoomUsers(data);
+      setRoomUrs(data);
+      setRoomUsers(data)
     });
 
     return () => socket.off('chatroom_users');

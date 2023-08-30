@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 
 const SendStatus = ({ socket, username, room, userRole }) => {
   const [status, setStatus] = useState(false)
-  console.log(username)
+
   const sendStatus = (e) => {
     e.preventDefault
     setStatus(true)
@@ -13,11 +13,10 @@ const SendStatus = ({ socket, username, room, userRole }) => {
       socket.emit('send_status', {
         username,
         room,
-        status,
+        status: true,
         userRole,
         __createdtime__
       })
-      setStatus('')
     }
   }
 

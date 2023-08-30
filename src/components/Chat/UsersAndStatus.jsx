@@ -1,73 +1,116 @@
 import styles from './styles.module.css'
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 
-const UsersAndStatus = ({ socket, username, user, room }) => {
-  const [roomUsers, setRoomUsers] = useState([])
-  const [statusReceived, setStatusReceived] = useState(false)
-
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    socket.on('chatroom_users', (data) => {
-      console.log(data)
-      setRoomUsers(data)
-    })
-
-    return () => socket.off('chatroom_users')
-  }, [socket])
+const UsersAndStatus = ({ socket, username, roomUsers }) => {
+  const [statusReceived, setStatusReceived] = useState([])
 
   useEffect(() => {
     socket.on('receive_status', (data) => {
-      console.log(data)
-      setStatusReceived((state) => [
-        ...state,
-        {
-          status: data.status,
-          username: data.username,
-          userRole: data.userRole,
-          __createdtime__: data.__createdtime__
-        }
-      ])
+      setStatusReceived((prevStatusReceived) => [...prevStatusReceived, data])
     })
-
-    // Remove event listener on component unmount
-    return () => socket.off('receive_message')
-  }, [socket])
-
-  const leaveRoom = () => {
-    const __createdtime__ = Date.now()
-    socket.emit('leave_room', { username, room, __createdtime__ })
-    // Redirect to home page
-    navigate('/', { replace: true })
-  }
-
+    return () => socket.off('receive_status')
+  }, [socket, statusReceived])
+  console.log(roomUsers)
+  console.log(statusReceived)
+  const studentStatus = roomUsers
+    .filter((user) => user.user.role === 'student')
+    .map((user) => ({
+      ...user.user,
+      status:
+        statusReceived.find(
+          (student) => student.username === user.user.name
+        )?.status || false
+    }))
+  console.log('STUDENT STATUS: ', studentStatus)
   return (
     <div className={styles.roomAndUsersColumn}>
-      <h2 className={styles.roomTitle}>{room}</h2>
-
       <div>
-        {roomUsers.length > 0 && <h5 className={styles.usersTitle}>Users:</h5>}
         <ul className={styles.usersList}>
-          {roomUsers.map((user) => (
+          {studentStatus.map((student) => (
             <li
               style={{
-                fontWeight: `${user.username === username ? 'bold' : 'normal'}`,
-                color: `${user.user.role === 'teacher' ? 'red' : 'black'}`
+                fontWeight: 'normal',
+                color: `${student.status === true ? 'green' : 'yellow'}`
               }}
-              key={user.id}
+              key={student.name}
             >
-              {user.username}
+              <div
+                className="userStatus"
+                style={{
+                  backgroundColor: `${
+                    student.status === true ? 'yellow' : 'purple'
+                  }`
+                }}
+              >
+                Student: {student.name}
+              </div>
             </li>
           ))}
         </ul>
       </div>
-
-      <button className="btn btn-outline" onClick={leaveRoom}>
-        Leave
-      </button>
     </div>
   )
 }
 
 export default UsersAndStatus
+
+// import styles from './styles.module.css'
+// import { useState, useEffect } from 'react'
+
+// const UsersAndStatus = ({ socket, username, roomUsers }) => {
+//   const [statusReceived, setStatusReceived] = useState([])
+//   const [studentStatus, setStudentStatus] = useState([])
+
+//   useEffect(() => {
+//     socket.on('receive_status', (data) => {
+//       setStatusReceived(data)
+//     })
+//     return () => socket.off('receive_status')
+//   }, [socket])
+
+//   const currentStatus = () => {
+//     let students = []
+//     roomUsers.forEach((user) => {
+//       if (user.user.role === 'student') {
+//         students = statusReceived.filter(
+//           (student) => (student.username === user.user.username)
+//         )
+//       }
+//     })
+
+//     console.log(students)
+
+//     setStudentStatus((prevStudentStatus) => [...prevStudentStatus, ...students])
+//     const studentList =students.map((student) => (
+//       <li
+//         style={{
+//           fontWeight: `${student.username === username ? 'bold' : 'normal'}`,
+//           color: `${student.status === 'true' ? 'green' : 'yellow'}`
+//         }}
+//         key={student.id}
+//       >
+//         <div
+//           className="userStatus"
+//           style={{
+//             backgroundColor: `${student.status === 'true' ? 'amber' : 'purple'}`
+//           }}
+//         >
+//           {student.username}
+//         </div>
+//       </li>
+//     ))
+
+//     return studentList
+//   }
+//   // Remove event listener on component unmount
+
+//   return (
+//     <div className={styles.roomAndUsersColumn}>
+//       <div>
+//         <ul className={styles.usersList}>{currentStatus()}</ul>
+//       </div>
+//     </div>
+//   )
+// }
+
+// export default UsersAndStatus

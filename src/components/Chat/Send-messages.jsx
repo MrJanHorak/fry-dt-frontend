@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 
 const SendMessage = ({ socket, username, room, userRole }) => {
   const [message, setMessage] = useState('')
-  console.log(username)
+
   const sendMessage = () => {
     if (message !== '') {
       const __createdtime__ = Date.now()
