@@ -1,4 +1,4 @@
-h1{
+h1 {
   margin-left: 5px;
 }
 .add-student-container {
@@ -24,7 +24,6 @@ h1{
   border: 1px solid #292934;
   border-radius: 7px;
 }
-
 
 @media (orientation: portrait) {
   .add-student-container {

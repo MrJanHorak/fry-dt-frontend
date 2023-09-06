@@ -1,26 +1,26 @@
-import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import '../../styles/Nav.css';
+import React, { useState } from 'react'
+import { NavLink } from 'react-router-dom'
+import '../../styles/Nav.css'
 
-import LogoDesktop from '../../assets/logo/fry-diagnosis-tool.png';
-import { MdClose } from 'react-icons/md';
-import { FiMenu } from 'react-icons/fi';
+import LogoDesktop from '../../assets/logo/fry-diagnosis-tool.png'
+import { MdClose } from 'react-icons/md'
+import { FiMenu } from 'react-icons/fi'
 
 const Nav = (props) => {
-  const [navbarOpen, setNavbarOpen] = useState(false);
+  const [navbarOpen, setNavbarOpen] = useState(false)
 
   const handleToggle = () => {
-    setNavbarOpen((prev) => !prev);
-  };
+    setNavbarOpen((prev) => !prev)
+  }
 
   const closeMenu = () => {
-    setNavbarOpen(false);
-  };
+    setNavbarOpen(false)
+  }
 
   return (
     <>
-      <div id='hamburger'>
-        <nav className='navBar'>
+      <div id="hamburger">
+        <nav className="navBar">
           <button onClick={handleToggle}>
             {navbarOpen ? (
               <MdClose
@@ -35,37 +35,37 @@ const Nav = (props) => {
           {props.user && props.user.isAdmin ? (
             <ul className={`menuNav ${navbarOpen ? ' showMenu' : ''}`}>
               <li>
-                <NavLink id='logo' to='/' onClick={() => closeMenu()}>
-                  <img src={LogoDesktop} alt='logo' />
+                <NavLink id="logo" to="/" onClick={() => closeMenu()}>
+                  <img src={LogoDesktop} alt="logo" />
                 </NavLink>
               </li>
               <li>
-                <NavLink to='/testing' onClick={() => closeMenu()}>
+                <NavLink to="/testing" onClick={() => closeMenu()}>
                   Testing center
                 </NavLink>
               </li>
               <li>
                 {' '}
-                <NavLink to='/study' onClick={() => closeMenu()}>
+                <NavLink to="/study" onClick={() => closeMenu()}>
                   Study Words
                 </NavLink>
               </li>
               <li>
-                <NavLink to='/profile' onClick={() => closeMenu()}>
+                <NavLink to="/profile" onClick={() => closeMenu()}>
                   Profile
                 </NavLink>
               </li>
               <li>
-                <NavLink to='/admin' onClick={() => closeMenu()}>
+                <NavLink to="/admin" onClick={() => closeMenu()}>
                   Admin Panel
                 </NavLink>
               </li>
               <li>
                 <NavLink
-                  to='/'
+                  to="/"
                   onClick={() => {
-                    props.handleLogout();
-                    closeMenu();
+                    props.handleLogout()
+                    closeMenu()
                   }}
                 >
                   Logout
@@ -75,32 +75,32 @@ const Nav = (props) => {
           ) : props.user ? (
             <ul className={`menuNav ${navbarOpen ? ' showMenu' : ''}`}>
               <li>
-                <NavLink id='logo' to='/' onClick={() => closeMenu()}>
-                  <img src={LogoDesktop} alt='logo' />
+                <NavLink id="logo" to="/" onClick={() => closeMenu()}>
+                  <img src={LogoDesktop} alt="logo" />
                 </NavLink>
               </li>
               <li>
-                <NavLink to='/testing' onClick={() => closeMenu()}>
+                <NavLink to="/testing" onClick={() => closeMenu()}>
                   Testing Center
                 </NavLink>
               </li>
               <li>
                 {' '}
-                <NavLink to='/study' onClick={() => closeMenu()}>
+                <NavLink to="/study" onClick={() => closeMenu()}>
                   Study Words
                 </NavLink>
               </li>
               <li>
-                <NavLink to='/profile' onClick={() => closeMenu()}>
+                <NavLink to="/profile" onClick={() => closeMenu()}>
                   Profile
                 </NavLink>
               </li>
               <li>
                 <NavLink
-                  to='/'
+                  to="/"
                   onClick={() => {
-                    props.handleLogout();
-                    closeMenu();
+                    props.handleLogout()
+                    closeMenu()
                   }}
                 >
                   Logout
@@ -110,17 +110,17 @@ const Nav = (props) => {
           ) : (
             <ul className={`menuNav ${navbarOpen ? ' showMenu' : ''}`}>
               <li>
-                <div className='logoHolder'>
-                  <img src={LogoDesktop} alt='logo' />
+                <div className="logoHolder">
+                  <img src={LogoDesktop} alt="logo" />
                 </div>
               </li>
               <li>
                 {' '}
                 <NavLink
-                  to='/signup'
+                  to="/signup"
                   onClick={() => {
-                    props.handleLogout();
-                    closeMenu();
+                    props.handleLogout()
+                    closeMenu()
                   }}
                 >
                   Sign Up
@@ -129,10 +129,10 @@ const Nav = (props) => {
               <li>
                 {' '}
                 <NavLink
-                  to='/signin'
+                  to="/signin"
                   onClick={() => {
-                    props.handleLogout();
-                    closeMenu();
+                    props.handleLogout()
+                    closeMenu()
                   }}
                 >
                   Sign In
@@ -142,30 +142,30 @@ const Nav = (props) => {
           )}
         </nav>
       </div>
-      <div id='nav-bar'>
-        <nav className='nav-bar'>
-          <NavLink id='logo' to='/' onClick={() => closeMenu()}>
-            <img src={LogoDesktop} alt='logo' />
+      <div id="nav-bar">
+        <nav className="nav-bar">
+          <NavLink id="logo" to="/" onClick={() => closeMenu()}>
+            <img src={LogoDesktop} alt="logo" />
           </NavLink>
           {props.user && props.user.isAdmin ? (
             <>
-              <NavLink to='/testing' onClick={() => closeMenu()}>
+              <NavLink to="/testing" onClick={() => closeMenu()}>
                 Testing Center
               </NavLink>
-              <NavLink to='/study' onClick={() => closeMenu()}>
+              <NavLink to="/study" onClick={() => closeMenu()}>
                 Study Words
               </NavLink>
-              <NavLink to='/profile' onClick={() => closeMenu()}>
+              <NavLink to="/profile" onClick={() => closeMenu()}>
                 Profile
               </NavLink>
-              <NavLink to='/admin' onClick={() => closeMenu()}>
+              <NavLink to="/admin" onClick={() => closeMenu()}>
                 Admin Panel
               </NavLink>
               <NavLink
-                to='/'
+                to="/"
                 onClick={() => {
-                  props.handleLogout();
-                  closeMenu();
+                  props.handleLogout()
+                  closeMenu()
                 }}
               >
                 {' '}
@@ -175,20 +175,20 @@ const Nav = (props) => {
           ) : props.user ? (
             <>
               {' '}
-              <NavLink to='/testing' onClick={() => closeMenu()} exact>
+              <NavLink to="/testing" onClick={() => closeMenu()} exact>
                 Testing Center
               </NavLink>
-              <NavLink to='/study' onClick={() => closeMenu()}>
+              <NavLink to="/study" onClick={() => closeMenu()}>
                 Study Words
               </NavLink>
-              <NavLink to='/profile' onClick={() => closeMenu()}>
+              <NavLink to="/profile" onClick={() => closeMenu()}>
                 Profile
               </NavLink>
               <NavLink
-                to='/'
+                to="/"
                 onClick={() => {
-                  props.handleLogout();
-                  closeMenu();
+                  props.handleLogout()
+                  closeMenu()
                 }}
               >
                 Logout
@@ -197,19 +197,19 @@ const Nav = (props) => {
           ) : (
             <>
               <NavLink
-                to='/signup'
+                to="/signup"
                 onClick={() => {
-                  props.handleLogout();
-                  closeMenu();
+                  props.handleLogout()
+                  closeMenu()
                 }}
               >
                 Sign Up
               </NavLink>
               <NavLink
-                to='/signin'
+                to="/signin"
                 onClick={() => {
-                  props.handleLogout();
-                  closeMenu();
+                  props.handleLogout()
+                  closeMenu()
                 }}
               >
                 Sign In
@@ -219,7 +219,7 @@ const Nav = (props) => {
         </nav>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default Nav;
+export default Nav

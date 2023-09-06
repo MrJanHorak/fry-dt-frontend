@@ -38,7 +38,7 @@ h1 span {
 }
 .flashcard-container button:disabled {
   background: #e95050;
-  color:#e95050;
+  color: #e95050;
 }
 
 #button-container {

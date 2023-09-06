@@ -9,7 +9,6 @@ const Messages = ({ socket }) => {
   // Runs whenever a socket event is received from the server
   useEffect(() => {
     socket.on('receive_message', (data) => {
-
       setMessagesReceived((state) => [
         ...state,
         {

@@ -1,45 +1,53 @@
-import React, { useEffect, useState, useTimeout } from 'react';
-import { useSpeechSynthesis } from 'react-speech-kit';
-import { RiUserVoiceFill } from 'react-icons/ri';
-import { IoArrowBack, IoArrowForward } from 'react-icons/io5';
+import React, { useEffect, useState, useTimeout } from 'react'
+import { useSpeechSynthesis } from 'react-speech-kit'
+import { RiUserVoiceFill } from 'react-icons/ri'
+import { IoArrowBack, IoArrowForward } from 'react-icons/io5'
 
-import '../../styles/FlashCard.css';
+import '../../styles/FlashCard.css'
 
-const FlashCard = ({ profile, handleClick, handleBack, displayWord }) => {
-  const [speaking, setSpeaking] = useState(false);
-  const [buttonDisabled, setButtonDisabled] = useState(true);
-  const { speak, voices } = useSpeechSynthesis();
+const FlashCard = ({
+  profile,
+  handleClick,
+  handleBack,
+  displayWord,
+  isTest
+}) => {
+  const [speaking, setSpeaking] = useState(false)
+  const [buttonDisabled, setButtonDisabled] = useState(true)
+  const { speak, voices } = useSpeechSynthesis()
 
   useEffect(() => {
-    setButtonDisabled(true);
-    const timedSpeaking = setTimeout(() => {
-      setSpeaking(true);
-      speak({
-        text: displayWord,
-        voice: voices[profile.voice],
-        rate: profile.rate,
-        pitch: profile.pitch,
-      });
-      setSpeaking(false);
-      setButtonDisabled(false);
-    }, 4000);
-    return () => clearTimeout(timedSpeaking);
-  }, [displayWord]);
+    if (!isTest) {
+      setButtonDisabled(true)
+      const timedSpeaking = setTimeout(() => {
+        setSpeaking(true)
+        speak({
+          text: displayWord,
+          voice: voices[profile.voice],
+          rate: profile.rate,
+          pitch: profile.pitch
+        })
+        setSpeaking(false)
+        setButtonDisabled(false)
+      }, 4000)
+      return () => clearTimeout(timedSpeaking)
+    }
+  }, [displayWord])
 
   return displayWord ? (
-    <div className='flashcard-container'>
-      <div className='flashcard-definition'>
-        <div id='word'>
+    <div className="flashcard-container">
+      <div className="flashcard-definition">
+        <div id="word">
           <h1> {displayWord} </h1>
         </div>
 
-        <div id='button-container'>
+        <div id="button-container">
           <button
             {...(!speaking
               ? {
                   onClick: () => {
-                    handleBack();
-                  },
+                    handleBack()
+                  }
                 }
               : {})}
           >
@@ -54,9 +62,9 @@ const FlashCard = ({ profile, handleClick, handleBack, displayWord }) => {
                       text: displayWord,
                       voice: voices[profile.voice],
                       rate: profile.rate,
-                      pitch: profile.pitch,
-                    });
-                  },
+                      pitch: profile.pitch
+                    })
+                  }
                 }
               : {})}
           >
@@ -66,8 +74,8 @@ const FlashCard = ({ profile, handleClick, handleBack, displayWord }) => {
             {...(!speaking
               ? {
                   onClick: () => {
-                    handleClick();
-                  },
+                    handleClick()
+                  }
                 }
               : {})}
           >
@@ -80,7 +88,7 @@ const FlashCard = ({ profile, handleClick, handleBack, displayWord }) => {
     <div>
       <h2>Loading Flashcards ...</h2>
     </div>
-  );
-};
+  )
+}
 
-export default FlashCard;
+export default FlashCard

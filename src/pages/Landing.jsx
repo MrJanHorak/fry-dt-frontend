@@ -1,11 +1,11 @@
-import React from 'react';
+import React from 'react'
 
 export default function Landing({ user }) {
   return (
-    <div id='landing-page'>
+    <div id="landing-page">
       <h2>FRY Word Diagnosis Tool</h2>
-      <img src='src/assets/logo/fry-diagnosis-tool.png' alt='logo' />
-      <div className='flashcard'>
+      <img src="src/assets/logo/fry-diagnosis-tool.png" alt="logo" />
+      <div className="flashcard">
         <p>
           This tool is designed to help teachers test a students ability to
           recognise sight words.
@@ -46,5 +46,5 @@ export default function Landing({ user }) {
         </p>
       </div>
     </div>
-  );
+  )
 }

@@ -17,16 +17,6 @@ const SendStatus = ({ socket, username, room, userRole }) => {
   const sendStatus = (e) => {
     e.preventDefault
     setStatus(prevStatus => !prevStatus)
-    // if (!status) {
-    //   const __createdtime__ = Date.now()
-    //   socket.emit('send_status', {
-    //     username,
-    //     room,
-    //     status: true,
-    //     userRole,
-    //     __createdtime__
-    //   })
-    // }
   }
 
   return (

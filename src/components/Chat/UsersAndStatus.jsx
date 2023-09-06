@@ -41,7 +41,7 @@ const UsersAndStatus = ({ socket, roomUsers }) => {
                 fontWeight: 'normal',
                 color: `${student?.status === true ? 'green' : 'yellow'}`
               }}
-              key={student.username} 
+              key={student.name} 
             >
               <div
                 className="userStatus"

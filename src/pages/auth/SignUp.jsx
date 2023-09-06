@@ -1,51 +1,51 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import '../../styles/Auth.css';
+import React, { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import '../../styles/Auth.css'
 
 // Assets
-import robot from '../../assets/avatars/orange1.png'; //<= included in starter code
+import robot from '../../assets/avatars/orange1.png' //<= included in starter code
 
 // Services
-import { signup } from '../../services/authService';
+import { signup } from '../../services/authService'
 
 //Components
-import AvatarSelection from './AvatarSelection';
+import AvatarSelection from './AvatarSelection'
 
 const SignUp = (props) => {
-  const navigate = useNavigate();
-  const [popup, setPopup] = useState(false);
-  const [msg, setMsg] = useState('');
+  const navigate = useNavigate()
+  const [popup, setPopup] = useState(false)
+  const [msg, setMsg] = useState('')
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     grade: 1,
     role: '',
-    avatar: robot,
-  });
+    avatar: robot
+  })
 
   const handlePopup = () => {
-    setPopup(!popup);
-  };
+    setPopup(!popup)
+  }
 
   const handleChange = (e) => {
-    setMsg('');
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    setMsg('')
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
-      await signup(formData);
-      props.handleSignupOrLogin();
-      navigate('/');
+      await signup(formData)
+      props.handleSignupOrLogin()
+      navigate('/')
     } catch (error) {
-      setMsg(error.message);
+      setMsg(error.message)
     }
-  };
+  }
 
   return (
-    <div className='signup-page'>
+    <div className="signup-page">
       {popup && (
         <AvatarSelection
           formData={formData}
@@ -54,8 +54,8 @@ const SignUp = (props) => {
         />
       )}
 
-      <div className='form-container'>
-        <div className='title-container'>
+      <div className="form-container">
+        <div className="title-container">
           <h1>Create an Account</h1>
           {msg ? (
             <h3>{msg}</h3>
@@ -64,88 +64,88 @@ const SignUp = (props) => {
           )}
         </div>
 
-        <form className='register-form' onSubmit={handleSubmit}>
+        <form className="register-form" onSubmit={handleSubmit}>
           <input
             required
-            name='name'
-            type='text'
-            autoComplete='off'
-            placeholder='Username'
+            name="name"
+            type="text"
+            autoComplete="off"
+            placeholder="Username"
             onChange={handleChange}
             value={formData.name}
           />
           <input
             required
-            name='email'
-            type='email'
-            autoComplete='off'
-            placeholder='Email'
+            name="email"
+            type="email"
+            autoComplete="off"
+            placeholder="Email"
             onChange={handleChange}
             value={formData.email}
           />
           <input
             required
-            name='password'
-            type='password'
-            autoComplete='off'
-            placeholder='Password'
+            name="password"
+            type="password"
+            autoComplete="off"
+            placeholder="Password"
             onChange={handleChange}
             value={formData.password}
           />
           <input
             required
-            name='grade'
-            type='number'
-            min='1'
-            max='5'
-            autoComplete='off'
-            placeholder='grade'
+            name="grade"
+            type="number"
+            min="1"
+            max="5"
+            autoComplete="off"
+            placeholder="grade"
             onChange={handleChange}
             value={formData.grade}
           />
 
           <button
-            type='button'
-            autoComplete='off'
-            id='avatar-button'
+            type="button"
+            autoComplete="off"
+            id="avatar-button"
             onClick={handlePopup}
           >
             Select Avatar
           </button>
           <ul>
             <input
-              name='role'
-              type='radio'
-              value='teacher'
-              id='teacher'
+              name="role"
+              type="radio"
+              value="teacher"
+              id="teacher"
               onChange={handleChange}
             />
 
-            <label htmlFor='teacher'>Teacher</label>
+            <label htmlFor="teacher">Teacher</label>
 
             <input
-              name='role'
-              type='radio'
-              value='parent'
-              id='parent'
+              name="role"
+              type="radio"
+              value="parent"
+              id="parent"
               onChange={handleChange}
             />
 
-            <label htmlFor='parent'>Parent</label>
+            <label htmlFor="parent">Parent</label>
           </ul>
-          <button autoComplete='off' id='submit-button' type='submit'>
+          <button autoComplete="off" id="submit-button" type="submit">
             SIGN UP
           </button>
         </form>
-        <div className='redirect-container'>
+        <div className="redirect-container">
           <p>Already have an account?</p>
-          <Link className='redirect-link' to='/signin'>
+          <Link className="redirect-link" to="/signin">
             Sign In
           </Link>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SignUp;
+export default SignUp

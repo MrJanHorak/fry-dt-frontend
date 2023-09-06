@@ -1,15 +1,15 @@
-import React from 'react';
-import QRCode from 'react-qr-code';
-import '../../styles/QrPage.css';
-import CryptoJS from 'crypto-js';
+import React from 'react'
+import QRCode from 'react-qr-code'
+import '../../styles/QrPage.css'
+import CryptoJS from 'crypto-js'
 
 const CreateQr = ({ user, pw }) => {
-  const encryptKey = import.meta.env.VITE_REACT_APP_ENCRYPTKEY;
+  const encryptKey = import.meta.env.VITE_REACT_APP_ENCRYPTKEY
   const qrCard = user.students.map((student) => {
     let qrValue = [
       CryptoJS.AES.encrypt(JSON.stringify(student.name), encryptKey).toString(),
-      pw,
-    ].join(',');
+      pw
+    ].join(',')
 
     return (
       <div
@@ -22,9 +22,9 @@ const CreateQr = ({ user, pw }) => {
           padding: 10,
           margin: 20,
           border: '1px solid black',
-          borderRadius: 12,
+          borderRadius: 12
         }}
-        className='qr-card'
+        className="qr-card"
       >
         <div
           style={{
@@ -32,13 +32,13 @@ const CreateQr = ({ user, pw }) => {
             backgroundColor: 'grey',
             borderTopRightRadius: 12,
             borderTopLeftRadius: 12,
-            color: 'white',
+            color: 'white'
           }}
-          className='qr-card-header'
+          className="qr-card-header"
         >
           <h2>FRY Diagnosis Tool</h2>
         </div>
-        <div style={{ padding: 20 }} className='qr-code-field'>
+        <div style={{ padding: 20 }} className="qr-code-field">
           <QRCode value={qrValue} />
         </div>
         <div
@@ -50,24 +50,24 @@ const CreateQr = ({ user, pw }) => {
             color: 'white',
             fontWeight: 500,
             justifyContent: 'center',
-            textAlign: 'center',
+            textAlign: 'center'
           }}
-          className='qr-code-footer'
+          className="qr-code-footer"
         >
           <h2>{student.name}</h2>
         </div>
       </div>
-    );
-  });
+    )
+  })
 
   return (
     <div
       style={{ display: 'flex', flexDirection: 'row', maxWidth: '900px' }}
-      className='qr-card-page'
+      className="qr-card-page"
     >
       {qrCard}
     </div>
-  );
-};
+  )
+}
 
-export default CreateQr;
+export default CreateQr

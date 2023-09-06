@@ -73,8 +73,8 @@
 }
 
 .Collapsible__trigger:after {
-  font-family: "FontAwesome";
-  content: "\f107";
+  font-family: 'FontAwesome';
+  content: '\f107';
   position: absolute;
   right: 10px;
   top: 10px;
@@ -90,12 +90,12 @@
   background-color: grey;
 }
 
-#user-students{
+#user-students {
   padding: 0;
   border: 3px solid blue;
 }
 
-.qr-code-generation-form{
+.qr-code-generation-form {
   align-items: center;
   text-align: center;
   display: flex;
@@ -103,12 +103,12 @@
   gap: 10px;
 }
 
-.qr-code-generation-form button{
+.qr-code-generation-form button {
   margin-top: 0;
   width: 150px;
 }
 
-#generateQr{
+#generateQr {
   width: 250px;
   padding: 16px;
   font-size: 16px;
@@ -172,7 +172,7 @@
 
   .Collapsible {
     width: 320px;
-    }
+  }
 }
 
 @media (orientation: landscape) {
@@ -191,8 +191,8 @@
     grid-template-rows: 70% 30%;
     grid-template-columns: 40% 60%;
     grid-template-areas:
-      "main bio"
-      "button contact";
+      'main bio'
+      'button contact';
   }
 
   #profile-image {
@@ -240,6 +240,4 @@
     margin-bottom: 0.3em;
     text-align: center;
   }
-
-
 }

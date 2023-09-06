@@ -1,23 +1,23 @@
-import * as tokenService from './tokenService';
-const BASE_URL = 'http://localhost:3000/api/auth';
+import * as tokenService from './tokenService'
+const BASE_URL = 'http://localhost:3000/api/auth'
 
 async function signup(user) {
   try {
     const res = await fetch(`${BASE_URL}/signup`, {
       method: 'POST',
       headers: new Headers({ 'Content-Type': 'application/json' }),
-      body: JSON.stringify(user),
-    });
-    const json = await res.json();
+      body: JSON.stringify(user)
+    })
+    const json = await res.json()
     if (json.token) {
-      tokenService.setToken(json.token);
+      tokenService.setToken(json.token)
     }
     if (json.err) {
-      throw new Error(json.err);
+      throw new Error(json.err)
     }
   } catch (err) {
-    console.log(err);
-    throw err;
+    console.log(err)
+    throw err
   }
 }
 
@@ -26,24 +26,24 @@ async function addStudent(user) {
     const res = await fetch(`${BASE_URL}/addStudent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(user),
-    });
-    const json = await res.json();
+      body: JSON.stringify(user)
+    })
+    const json = await res.json()
     if (json.err) {
-      throw new Error(json.err);
+      throw new Error(json.err)
     }
   } catch (err) {
-    console.log(err);
-    throw err;
+    console.log(err)
+    throw err
   }
 }
 
 function getUser() {
-  return tokenService.getUserFromToken();
+  return tokenService.getUserFromToken()
 }
 
 function logout() {
-  tokenService.removeToken();
+  tokenService.removeToken()
 }
 
 async function login(credentials) {
@@ -51,18 +51,18 @@ async function login(credentials) {
     const res = await fetch(`${BASE_URL}/login`, {
       method: 'POST',
       headers: new Headers({ 'Content-Type': 'application/json' }),
-      body: JSON.stringify(credentials),
-    });
-    const json = await res.json();
+      body: JSON.stringify(credentials)
+    })
+    const json = await res.json()
     if (json.token) {
-      tokenService.setToken(json.token);
+      tokenService.setToken(json.token)
     }
     if (json.err) {
-      throw new Error(json.err);
+      throw new Error(json.err)
     }
   } catch (err) {
-    throw err;
+    throw err
   }
 }
 
-export { signup, getUser, logout, login, addStudent };
+export { signup, getUser, logout, login, addStudent }

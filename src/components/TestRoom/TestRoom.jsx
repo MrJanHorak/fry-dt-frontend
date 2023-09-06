@@ -3,8 +3,6 @@ import styles from './styles.module.css'
 import { useEffect } from 'react'
 
 const TestRoom = ({ user, room, setRoom, socket }) => {
-  
-  console.log(user)
   const navigate = useNavigate()
   let username = user.name
   const joinRoom = () => {

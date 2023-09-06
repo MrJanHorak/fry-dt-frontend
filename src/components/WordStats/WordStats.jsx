@@ -11,7 +11,7 @@ const WordStats = ({ userProfile }) => {
       (word.timesIncorrect / word.timesPracticed) *
       100
     ).toFixed(2)
-    console.log(userProfile)
+
     return (
       <div key={word._id} className="practiced-words">
         <h2>{word.word}</h2>

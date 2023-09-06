@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../../styles/AddStudent.css";
 
 // Assets
-import green1 from "../../assets/avatars/green1.png"; //<= included in starter code
+import green1 from "../../assets/avatars/green1.png";
 
 // Services
 import { addStudent } from "../../services/authService";
