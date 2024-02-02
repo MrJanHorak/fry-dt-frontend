@@ -1,12 +1,13 @@
 import React from 'react'
+import '../styles/Landing.css'
 
 export default function Landing({ user }) {
   return (
     <div id="landing-page">
       <h2>FRY Word Diagnosis Tool</h2>
-      <img src="src/assets/logo/fry-diagnosis-tool.png" alt="logo" />
+      <img src="src/assets/logo/fry-diagnosis-tool.png" alt="logo" className="logo" />
       <div className="flashcard">
-        <p>
+        <p className="intro">
           This tool is designed to help teachers test a students ability to
           recognise sight words.
           <br />
@@ -25,12 +26,12 @@ export default function Landing({ user }) {
           worked on and bugs that need to be figured out. Here a list of items I
           hope to cover in a the next few weeks:
         </p>
-        <ul>
+        <ul className="future-plans">
           <li>graphical display of progress</li>
           <li>tracking words user struggles most with</li>
           <li>setting up groups of students</li>
         </ul>
-        <p>
+        <p className="call-to-action">
           Please give it a try, send me feedback, or feel free to join in and
           colaborate and code along.
           <br />

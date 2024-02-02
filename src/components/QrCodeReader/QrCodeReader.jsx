@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { QrReader } from 'react-qr-reader'
+import QrReader from 'react-qr-reader'
 import { useNavigate } from 'react-router-dom'
 import qrcode from '../../assets/qrcode.png'
 import CryptoJS from 'crypto-js'
@@ -13,40 +13,34 @@ const ReadQr = ({ handleSignupOrLogin }) => {
   const [msg, setMsg] = useState('')
   const [showScanner, setShowScanner] = useState(false)
 
+  const handleScan = async (result) => {
+    if (!!result) {
+      let resultTextSplit = result?.split(',')
+      let qrNameDecrypt = CryptoJS.AES.decrypt(resultTextSplit[0], encryptKey)
+      let qrName = await JSON.parse(qrNameDecrypt.toString(CryptoJS.enc.Utf8))
+      let qrPwDecrypt = CryptoJS.AES.decrypt(resultTextSplit[1], encryptKey)
+      let qrPw = await JSON.parse(qrPwDecrypt.toString(CryptoJS.enc.Utf8))
+      try {
+        await login({ name: qrName, pw: qrPw })
+        handleSignupOrLogin()
+        navigate('/')
+      } catch (error) {
+        setMsg(error.message)
+      }
+    }
+  }
+
+  const handleError = (error) => {
+    console.info(error)
+  }
+
   return (
     <>
       <div>
         {showScanner ? (
           <QrReader
-            onResult={async (result, error) => {
-              if (!!result) {
-                let resultTextSplit = result?.text.split(',')
-                let qrNameDecrypt = CryptoJS.AES.decrypt(
-                  resultTextSplit[0],
-                  encryptKey
-                )
-                let qrName = await JSON.parse(
-                  qrNameDecrypt.toString(CryptoJS.enc.Utf8)
-                )
-                let qrPwDecrypt = CryptoJS.AES.decrypt(
-                  resultTextSplit[1],
-                  encryptKey
-                )
-                let qrPw = await JSON.parse(
-                  qrPwDecrypt.toString(CryptoJS.enc.Utf8)
-                )
-                try {
-                  await login({ name: qrName, pw: qrPw })
-                  handleSignupOrLogin()
-                  navigate('/')
-                } catch (error) {
-                  setMsg(error.message)
-                }
-              }
-              if (!!error) {
-                console.info(error)
-              }
-            }}
+            onScan={handleScan}
+            onError={handleError}
             style={{ width: '100%' }}
           />
         ) : (

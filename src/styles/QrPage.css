@@ -26,3 +26,28 @@
   background-color: aqua;
   color: black;
 }
+.qr-card-page {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.qr-card {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  margin: 20px;
+}
+
+.qr-card-header,
+.qr-code-field,
+.qr-code-footer {
+  width: 90%; /* use a relative unit */
+}
+
+.qr-card-header,
+.qr-code-footer {
+  height: 45px;
+  background-color: aqua;
+  color: #000; /* ensure high contrast */
+}

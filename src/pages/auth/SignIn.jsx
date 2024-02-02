@@ -33,6 +33,10 @@ const SignIn = ({ handleSignupOrLogin }) => {
   return (
     <div className="signup-page">
       <div className="form-container">
+        <div className="qr-code-sign-in">
+          <br />
+          <ReadQr handleSignupOrLogin={handleSignupOrLogin} />
+        </div>
         <div className="signin-title-container">
           <h1>Sign In</h1>
           {msg ? <h3>{msg}</h3> : <h3>FRY Diagnosis Tool</h3>}
@@ -59,14 +63,10 @@ const SignIn = ({ handleSignupOrLogin }) => {
                 value={formData.pw}
               />
 
-              <button autoComplete="off" id="submit-button" type="submit">
+              <button autoComplete="off" className="submit-button" type="submit">
                 SIGN IN
               </button>
             </form>
-          </div>
-          <div className="QrCode-signin">
-            <br />
-            <ReadQr handleSignupOrLogin={handleSignupOrLogin} />
           </div>
         </div>
         <div className="redirect-container">
