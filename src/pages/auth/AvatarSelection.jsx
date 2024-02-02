@@ -1,39 +1,52 @@
-import React, { useEffect, useState } from 'react'
-import Select from 'react-select'
-import '../../styles/AvatarSelection.css'
+import React, { useEffect, useState } from 'react';
+import Select, { components } from 'react-select';
+import '../../styles/AvatarSelection.css';
 
 const AvatarSelection = (props) => {
-  const [avatars, setAvatars] = useState([])
-  const [selectedAvatar, setSelectedAvatar] = useState(null)
+  const [avatars, setAvatars] = useState([]);
+  const [selectedAvatar, setSelectedAvatar] = useState(null);
+
   useEffect(() => {
     const loadAvatars = async () => {
       const avatarModules = import.meta.glob(
         '../../assets/avatars/*.{png,jpg,jpeg,svg}'
-      )
-      const newAvatars = []
+      );
+      const newAvatars = [];
 
       for (const path in avatarModules) {
-        const avatar = await avatarModules[path]()
+        const avatar = await avatarModules[path]();
         newAvatars.push({
           value: path,
-          label: <img className="avatar" src={avatar.default} alt={path} width="50" height="50" />
-        })
+          label: path,
+          avatar: avatar.default,
+        });
       }
 
-      setAvatars(newAvatars)
-    }
+      setAvatars(newAvatars);
+    };
 
-    loadAvatars()
-  }, [])
+    loadAvatars();
+  }, []);
 
   const handleChange = (selectedOption) => {
-    setSelectedAvatar(selectedOption)
+    setSelectedAvatar(selectedOption);
     props.handleChange({
-      target: { name: 'avatar', value: selectedOption.label.props.src }
-    })
-  }
+      target: { name: 'avatar', value: selectedOption.avatar },
+    });
+  };
 
-  console.log(avatars)
+  const CustomOption = (props) => (
+    <components.Option {...props}>
+      <img className="avatar" src={props.data.avatar} alt={props.data.label} width="30" height="30" style={{ margin: '5px' }} />
+    </components.Option>
+  );
+
+  const MenuList = (props) => (
+    <components.MenuList {...props} style={{ display: 'flex', flexWrap: 'wrap' }}>
+      {props.children}
+    </components.MenuList>
+  );
+
   return (
     <div className="popup-container">
       <div className="popup-menu">
@@ -48,6 +61,10 @@ const AvatarSelection = (props) => {
           <Select
             onChange={handleChange}
             options={avatars}
+            components={{
+              Option: CustomOption,
+              MenuList: MenuList,
+            }}
             value={avatars.find((option) => option.value === selectedAvatar)}
           ></Select>
           <button
@@ -60,7 +77,7 @@ const AvatarSelection = (props) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AvatarSelection
+export default AvatarSelection;
