@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import QrReader from 'react-qr-reader'
+import {QrReader} from 'react-qr-reader'
 import { useNavigate } from 'react-router-dom'
 import qrcode from '../../assets/qrcode.png'
 import CryptoJS from 'crypto-js'

@@ -107,7 +107,7 @@ const SignUp = (props) => {
           <button
             type="button"
             autoComplete="off"
-            id="avatar-button"
+            className="submit-button"
             onClick={handlePopup}
           >
             Select Avatar
@@ -133,7 +133,7 @@ const SignUp = (props) => {
 
             <label htmlFor="parent">Parent</label>
           </ul>
-          <button autoComplete="off" id="submit-button" type="submit">
+          <button autoComplete="off" className="submit-button" type="submit">
             SIGN UP
           </button>
         </form>

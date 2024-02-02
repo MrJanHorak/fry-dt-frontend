@@ -38,7 +38,7 @@ export default function Landing({ user }) {
           <br />
           <b>test user:</b>
           <br />
-          <b>login: </b> first grader <b>Password: </b>firstgrader
+          <b>login: </b> first grader <b>Password: </b>testadmin
           <br />
           <br />
           <b>test admin user:</b>
