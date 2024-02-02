@@ -18,6 +18,12 @@ import Chat from './components/Chat/Chat'
 
 const socket = io.connect('http://localhost:3000')
 
+/**
+ * The main component of the application.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered App component
+ */
 const App = () => {
   const navigate = useNavigate()
   const [user, setUser] = useState(getUser())

@@ -1,6 +1,13 @@
 import React from 'react'
 import '../styles/Landing.css'
 
+/**
+ * Landing page component.
+ * 
+ * @param {Object} props - The component props.
+ * @param {Object} props.user - The user object.
+ * @returns {JSX.Element} The rendered Landing component.
+ */
 export default function Landing({ user }) {
   return (
     <div id="landing-page">

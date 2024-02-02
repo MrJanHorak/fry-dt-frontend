@@ -17,6 +17,13 @@ import ShowStudents from '../components/ShowStudents/ShowStudents'
 import CreateQr from '../components/CreateQr/CreateQr'
 import CryptoJS from 'crypto-js'
 
+/**
+ * Renders the user profile page.
+ * 
+ * @param {Object} props - The component props.
+ * @param {Object} props.user - The user object.
+ * @returns {JSX.Element} The rendered profile page.
+ */
 const Profile = ({ user }) => {
   const encryptKey = import.meta.env.VITE_REACT_APP_ENCRYPTKEY
   const [userProfile, setUserProfile] = useState()
