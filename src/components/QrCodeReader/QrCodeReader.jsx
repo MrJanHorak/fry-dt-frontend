@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import {QrReader} from 'react-qr-reader'
+import { QrReader } from 'react-qr-reader'
 import { useNavigate } from 'react-router-dom'
 import qrcode from '../../assets/qrcode.png'
 import CryptoJS from 'crypto-js'
@@ -15,7 +15,7 @@ const ReadQr = ({ handleSignupOrLogin }) => {
 
   const handleScan = async (result) => {
     if (!!result) {
-      let resultTextSplit = result?.split(',')
+      let resultTextSplit = result?.text.split(',')
       let qrNameDecrypt = CryptoJS.AES.decrypt(resultTextSplit[0], encryptKey)
       let qrName = await JSON.parse(qrNameDecrypt.toString(CryptoJS.enc.Utf8))
       let qrPwDecrypt = CryptoJS.AES.decrypt(resultTextSplit[1], encryptKey)
@@ -39,7 +39,7 @@ const ReadQr = ({ handleSignupOrLogin }) => {
       <div>
         {showScanner ? (
           <QrReader
-            onScan={handleScan}
+            onResult={handleScan}
             onError={handleError}
             style={{ width: '100%' }}
           />
