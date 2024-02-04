@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import words from '../assets/FryWordList.json'
+import words from '../../assets/FryWordList.json'
 
 // Services
-import { getProfileById } from '../services/profileService'
+import { getProfileById } from '../../services/profileService'
 
 // Components
-import FlashCard from '../components/FlashCard/FlashCard'
+import FlashCard from '../../components/FlashCard/FlashCard'
 
 // style
-import '../styles/Study.css'
+import './Study.css'
 
 function Study({ user }) {
   const [gradeLevelWords, setgradeLevelWords] = useState()

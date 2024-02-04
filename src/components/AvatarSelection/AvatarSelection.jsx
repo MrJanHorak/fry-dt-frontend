@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Select, { components } from 'react-select'
-import '../../styles/AvatarSelection.css'
+import './AvatarSelection.css'
 
 const AvatarSelection = (props) => {
   const [avatars, setAvatars] = useState([])

@@ -1,25 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
+// import { createPortal } from 'react-dom'
 import Collapsible from 'react-collapsible'
 import NewWindow from 'react-new-window'
 
-import '../styles/Profile.css'
+import './Profile.css'
 
 //services
-import { getProfileById, updateProfile } from '../services/profileService'
+import { getProfileById, updateProfile } from '../../services/profileService'
 
 //Components
-import AvatarSelection from './auth/AvatarSelection'
-import VoiceSettings from '../components/VoiceSettings/VoiceSettings'
-import WordStats from '../components/WordStats/WordStats'
-import AddStudent from '../components/AddStudent/AddStudent'
-import ShowStudents from '../components/ShowStudents/ShowStudents'
-import CreateQr from '../components/CreateQr/CreateQr'
+import AvatarSelection from '../../components/AvatarSelection/AvatarSelection'
+import VoiceSettings from '../../components/VoiceSettings/VoiceSettings'
+import WordStats from '../../components/WordStats/WordStats'
+import AddStudent from '../../components/AddStudent/AddStudent'
+import ShowStudents from '../../components/ShowStudents/ShowStudents'
+import CreateQr from '../../components/CreateQr/CreateQr'
 import CryptoJS from 'crypto-js'
 
 /**
  * Renders the user profile page.
- * 
+ *
  * @param {Object} props - The component props.
  * @param {Object} props.user - The user object.
  * @returns {JSX.Element} The rendered profile page.
@@ -89,6 +89,7 @@ const Profile = ({ user }) => {
 
   const handleQrChange = (e) => {
     const value = e.target.value
+
     setQr(CryptoJS.AES.encrypt(JSON.stringify(value), encryptKey).toString())
   }
 

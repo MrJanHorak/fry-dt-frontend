@@ -1,4 +1,4 @@
-import TestRoom from '../components/TestRoom/TestRoom'
+import TestRoom from '../../components/TestRoom/TestRoom'
 
 function Testing({ user, room, setRoom, socket }) {
   return (

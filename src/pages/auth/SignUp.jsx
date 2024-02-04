@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import '../../styles/Auth.css'
+import './Auth.css'
 
 // Assets
 import robot from '../../assets/avatars/orange1.png' //<= included in starter code
@@ -9,7 +9,7 @@ import robot from '../../assets/avatars/orange1.png' //<= included in starter co
 import { signup } from '../../services/authService'
 
 //Components
-import AvatarSelection from './AvatarSelection'
+import AvatarSelection from '../../components/AvatarSelection/AvatarSelection'
 
 const SignUp = (props) => {
   const navigate = useNavigate()

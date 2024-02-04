@@ -65,4 +65,20 @@ async function login(credentials) {
   }
 }
 
-export { signup, getUser, logout, login, addStudent }
+async function changePassword(credentials) {
+  try {
+    const res = await fetch(`${BASE_URL}/changePassword`, {
+      method: 'POST',
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify(credentials)
+    })
+    const json = await res.json()
+    if (json.err) {
+      throw new Error(json.err)
+    }
+  } catch (err) {
+    throw err
+  }
+}
+
+export { signup, getUser, logout, login, addStudent, changePassword }

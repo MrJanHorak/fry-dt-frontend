@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import '../../styles/Nav.css'
+import './Nav.css'
 
 import LogoDesktop from '../../assets/logo/fry-diagnosis-tool.png'
 import { MdClose } from 'react-icons/md'
@@ -175,7 +175,7 @@ const Nav = (props) => {
           ) : props.user ? (
             <>
               {' '}
-              <NavLink to="/testing" onClick={() => closeMenu()} exact>
+              <NavLink to="/testing" onClick={() => closeMenu()}>
                 Testing Center
               </NavLink>
               <NavLink to="/study" onClick={() => closeMenu()}>

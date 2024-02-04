@@ -8,7 +8,7 @@ import { removeStudent } from '../../services/profileService'
 import WordStats from '../WordStats/WordStats'
 
 // assets
-import '../../styles/ShowStudent.css'
+import './ShowStudent.css'
 
 const ShowStudents = ({ user }) => {
   const handleClick = async (studentId) => {

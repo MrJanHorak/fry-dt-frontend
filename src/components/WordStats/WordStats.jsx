@@ -1,5 +1,5 @@
 import React from 'react'
-import '../../styles/WordStats.css'
+import './WordStats.css'
 
 const WordStats = ({ userProfile }) => {
   const words = userProfile.practicedWords.map((word) => {

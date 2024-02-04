@@ -24,6 +24,7 @@ const ReadQr = ({ handleSignupOrLogin }) => {
         await login({ name: qrName, pw: qrPw })
         handleSignupOrLogin()
         navigate('/')
+        setShowScanner(false)
       } catch (error) {
         setMsg(error.message)
       }

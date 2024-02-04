@@ -28,8 +28,9 @@ To run the project:
 
 ## Contributing
 
-If you want to contribute to this project, please...
+If you want to contribute to this project, please feel free te reach out to me. 
+The [trello board for planning can be found here](https://trello.com/b/Ks4PxVKY/sight-word-diagnosis-tool)
 
 ## License
 
-This project is licensed under the...
+

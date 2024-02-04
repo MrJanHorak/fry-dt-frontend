@@ -1,5 +1,5 @@
 import React from 'react'
-import '../styles/Landing.css'
+import './Landing.css'
 
 /**
  * Landing page component.

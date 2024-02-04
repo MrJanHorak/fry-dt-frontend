@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../../styles/AddStudent.css";
+import "./AddStudent.css";
 
 // Assets
 import green1 from "../../assets/avatars/green1.png";

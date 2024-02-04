@@ -1,11 +1,16 @@
 import React from 'react'
 import QRCode from 'react-qr-code'
-import '../../styles/QrPage.css'
+import './QrPage.css'
 import CryptoJS from 'crypto-js'
+import { changePassword } from '../../services/authService'
 
 const CreateQr = ({ user, pw }) => {
   const encryptKey = import.meta.env.VITE_REACT_APP_ENCRYPTKEY
-  const qrCard = user.students.map((student) => {
+  const qrCard = user.students.map(async (student) => {
+    // update each students password
+    console.log('student', student)
+    await changePassword(student._id, pw)
+
     let qrValue = [
       CryptoJS.AES.encrypt(JSON.stringify(student.name), encryptKey).toString(),
       pw
