@@ -65,11 +65,18 @@ async function login(credentials) {
   }
 }
 
-async function changePassword(credentials) {
+async function changePassword(id, pw) {
+  const credentials = {
+    pw: pw,
+    newPw: pw
+  }
+
   try {
     const res = await fetch(`${BASE_URL}/changePassword`, {
       method: 'POST',
-      headers: new Headers({ 'Content-Type': 'application/json' }),
+      headers: {
+        Authorization: `Bearer ${tokenService.getToken()}`
+      },
       body: JSON.stringify(credentials)
     })
     const json = await res.json()
