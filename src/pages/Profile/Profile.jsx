@@ -89,8 +89,7 @@ const Profile = ({ user }) => {
 
   const handleQrChange = (e) => {
     const value = e.target.value
-
-    setQr(CryptoJS.AES.encrypt(JSON.stringify(value), encryptKey).toString())
+    setQr(value)
   }
 
   return (
@@ -109,7 +108,7 @@ const Profile = ({ user }) => {
               <div id="profile-image">
                 <img
                   id="profile-pic"
-                  alt="profile pictue"
+                  alt="profile picture"
                   src={userProfile?.avatar}
                 />
               </div>

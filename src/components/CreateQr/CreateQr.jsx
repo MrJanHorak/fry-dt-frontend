@@ -10,14 +10,13 @@ const CreateQr = ({ user, pw }) => {
 
   useEffect(() => {
     const generateQRCodesAndUpdatePasswords = async () => {
-      // First, generate the QR codes
       const qrCodes = user.students.map((student) => {
         let qrValue = [
           CryptoJS.AES.encrypt(
             JSON.stringify(student.name),
             encryptKey
           ).toString(),
-          pw
+          CryptoJS.AES.encrypt(JSON.stringify(pw), encryptKey).toString()
         ].join(',')
 
         return (
@@ -74,7 +73,6 @@ const CreateQr = ({ user, pw }) => {
       })
       setQrCards(qrCodes)
 
-      // Then, update the passwords
       await Promise.all(
         user.students.map((student) => changePassword(student._id, pw))
       )

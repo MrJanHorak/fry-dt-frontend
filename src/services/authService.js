@@ -67,7 +67,7 @@ async function login(credentials) {
 
 async function changePassword(id, pw) {
   const credentials = {
-    pw: pw,
+    student: id,
     newPw: pw
   }
 
@@ -75,11 +75,13 @@ async function changePassword(id, pw) {
     const res = await fetch(`${BASE_URL}/changePassword`, {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${tokenService.getToken()}`
       },
       body: JSON.stringify(credentials)
     })
     const json = await res.json()
+
     if (json.err) {
       throw new Error(json.err)
     }
