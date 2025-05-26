@@ -5,6 +5,7 @@ import './Nav.css'
 import LogoDesktop from '../../assets/logo/fry-diagnosis-tool.png'
 import { MdClose } from 'react-icons/md'
 import { FiMenu } from 'react-icons/fi'
+import PerformanceWidget from '../PerformanceWidget/PerformanceWidget'
 
 const Nav = (props) => {
   const [navbarOpen, setNavbarOpen] = useState(false)
@@ -147,74 +148,80 @@ const Nav = (props) => {
           <NavLink id="logo" to="/" onClick={() => closeMenu()}>
             <img src={LogoDesktop} alt="logo" />
           </NavLink>
-          {props.user && props.user.isAdmin ? (
-            <>
-              <NavLink to="/testing" onClick={() => closeMenu()}>
-                Testing Center
-              </NavLink>
-              <NavLink to="/study" onClick={() => closeMenu()}>
-                Study Words
-              </NavLink>
-              <NavLink to="/profile" onClick={() => closeMenu()}>
-                Profile
-              </NavLink>
-              <NavLink to="/admin" onClick={() => closeMenu()}>
-                Admin Panel
-              </NavLink>
-              <NavLink
-                to="/"
-                onClick={() => {
-                  props.handleLogout()
-                  closeMenu()
-                }}
-              >
+          <div className="nav-links">
+            {props.user && props.user.isAdmin ? (
+              <>
+                <NavLink to="/testing" onClick={() => closeMenu()}>
+                  Testing Center
+                </NavLink>
+                <NavLink to="/study" onClick={() => closeMenu()}>
+                  Study Words
+                </NavLink>
+                <NavLink to="/profile" onClick={() => closeMenu()}>
+                  Profile
+                </NavLink>
+                <NavLink to="/admin" onClick={() => closeMenu()}>
+                  Admin Panel
+                </NavLink>
+                <NavLink
+                  to="/"
+                  onClick={() => {
+                    props.handleLogout()
+                    closeMenu()
+                  }}
+                >
+                  {' '}
+                  Logout
+                </NavLink>
+              </>
+            ) : props.user ? (
+              <>
                 {' '}
-                Logout
-              </NavLink>
-            </>
-          ) : props.user ? (
-            <>
-              {' '}
-              <NavLink to="/testing" onClick={() => closeMenu()}>
-                Testing Center
-              </NavLink>
-              <NavLink to="/study" onClick={() => closeMenu()}>
-                Study Words
-              </NavLink>
-              <NavLink to="/profile" onClick={() => closeMenu()}>
-                Profile
-              </NavLink>
-              <NavLink
-                to="/"
-                onClick={() => {
-                  props.handleLogout()
-                  closeMenu()
-                }}
-              >
-                Logout
-              </NavLink>
-            </>
-          ) : (
-            <>
-              <NavLink
-                to="/signup"
-                onClick={() => {
-                  props.handleLogout()
-                  closeMenu()
-                }}
-              >
-                Sign Up
-              </NavLink>
-              <NavLink
-                to="/signin"
-                onClick={() => {
-                  props.handleLogout()
-                  closeMenu()
-                }}
-              >
-                Sign In
-              </NavLink>
-            </>
+                <NavLink to="/testing" onClick={() => closeMenu()}>
+                  Testing Center
+                </NavLink>
+                <NavLink to="/study" onClick={() => closeMenu()}>
+                  Study Words
+                </NavLink>
+                <NavLink to="/profile" onClick={() => closeMenu()}>
+                  Profile
+                </NavLink>
+                <NavLink
+                  to="/"
+                  onClick={() => {
+                    props.handleLogout()
+                    closeMenu()
+                  }}
+                >
+                  Logout
+                </NavLink>
+              </>
+            ) : (
+              <>
+                <NavLink
+                  to="/signup"
+                  onClick={() => {
+                    props.handleLogout()
+                    closeMenu()
+                  }}
+                >
+                  Sign Up
+                </NavLink>
+                <NavLink
+                  to="/signin"
+                  onClick={() => {
+                    props.handleLogout()
+                    closeMenu()
+                  }}
+                >
+                  Sign In
+                </NavLink>
+              </>
+            )}
+          </div>
+          {/* Performance Widget - only show for authenticated users in development */}
+          {(process.env.NODE_ENV === 'development' || props.user?.isAdmin) && (
+            <PerformanceWidget />
           )}
         </nav>
       </div>

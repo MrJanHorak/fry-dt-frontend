@@ -5,8 +5,15 @@
 .nav-bar {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between; /* Changed from flex-end to space-between */
   padding: 0.5% 1% 0.5% 1%;
+}
+
+/* Nav links container */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .nav-bar a {
@@ -21,7 +28,6 @@
 #logo {
   margin: 0;
   display: flex;
-  margin-right: auto;
   align-items: center;
 }
 
@@ -42,6 +48,13 @@
   color: #000000;
   text-transform: uppercase;
   font-weight: bold;
+}
+
+/* Performance widget integration */
+.nav-bar .performance-widget {
+  margin-left: 20px;
+  border-left: 1px solid #ddd;
+  padding-left: 15px;
 }
 
 .nav-bar a:hover {
@@ -125,5 +138,28 @@
   }
   .navBar {
     display: inline;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-bar {
+    padding: 0.5% 2%;
+  }
+
+  .nav-links {
+    gap: 5px;
+  }
+
+  .nav-bar .performance-widget {
+    margin-left: 10px;
+    padding-left: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-bar .performance-widget {
+    margin-left: 5px;
+    padding-left: 5px;
+    border-left: none;
   }
 }

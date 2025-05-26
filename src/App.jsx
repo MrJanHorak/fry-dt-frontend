@@ -3,6 +3,9 @@ import { Routes, Route, useNavigate } from 'react-router-dom'
 import io from 'socket.io-client'
 import './App.css'
 
+// Context Providers
+import { PerformanceProvider } from './contexts/PerformanceContext'
+
 // Services
 import { getUser, logout } from './services/authService'
 
@@ -15,6 +18,7 @@ import Testing from './pages/Testing/Testing'
 import Study from './pages/Study/Study'
 import Profile from './pages/Profile/Profile'
 import Chat from './components/Chat/Chat'
+import MonitoringDashboard from './components/MonitoringDashboard/MonitoringDashboard'
 
 const socket = io.connect('http://localhost:3000')
 
@@ -42,43 +46,51 @@ const App = () => {
   }
 
   return (
-    <div className="App">
-      <Nav user={user} handleLogout={handleLogout} />
-      <Routes>
-        <Route path="/" element={<Landing user={user} />} />
-        <Route
-          path="/signin"
-          element={<SignIn handleSignupOrLogin={handleSignupOrLogin} />}
-        />
-        <Route
-          path="/signup"
-          element={<SignUp handleSignupOrLogin={handleSignupOrLogin} />}
-        />
-        <Route path="/study" element={<Study user={user} />} />
-        <Route
-          path="/testing"
-          element={
-            <Testing
-              user={user}
-              username={username}
-              setUsername={setUsername}
-              room={room}
-              setRoom={setRoom}
-              socket={socket}
-            />
-          }
-        />
-        <Route
-          path="/chat"
-          element={
-            <Chat user={user} username={username} room={room} socket={socket} />
-          }
-        />
-        <Route path="/profile" element={<Profile user={user} />} />
+    <PerformanceProvider>
+      <div className="App">
+        <Nav user={user} handleLogout={handleLogout} />
+        {user && <MonitoringDashboard />}
+        <Routes>
+          <Route path="/" element={<Landing user={user} />} />
+          <Route
+            path="/signin"
+            element={<SignIn handleSignupOrLogin={handleSignupOrLogin} />}
+          />
+          <Route
+            path="/signup"
+            element={<SignUp handleSignupOrLogin={handleSignupOrLogin} />}
+          />
+          <Route path="/study" element={<Study user={user} />} />
+          <Route
+            path="/testing"
+            element={
+              <Testing
+                user={user}
+                username={username}
+                setUsername={setUsername}
+                room={room}
+                setRoom={setRoom}
+                socket={socket}
+              />
+            }
+          />
+          <Route
+            path="/chat"
+            element={
+              <Chat
+                user={user}
+                username={username}
+                room={room}
+                socket={socket}
+              />
+            }
+          />
+          <Route path="/profile" element={<Profile user={user} />} />
 
-        {/* <Route path='/admin' element={<Admin user={user} />} /> */}
-      </Routes>
-    </div>
+          {/* <Route path='/admin' element={<Admin user={user} />} /> */}
+        </Routes>
+      </div>
+    </PerformanceProvider>
   )
 }
 
