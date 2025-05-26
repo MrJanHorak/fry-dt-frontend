@@ -7,6 +7,15 @@ import { useState, useEffect, useCallback } from 'react'
 export const usePerformance = () => {
   const [isSupported, setIsSupported] = useState(false)
   const [metrics, setMetrics] = useState({})
+  const [webVitals, setWebVitals] = useState({
+    lcp: null,
+    fid: null,
+    cls: null,
+    fcp: null,
+    ttfb: null
+  })
+  const [customMetrics, setCustomMetrics] = useState({})
+  const [measurements, setMeasurements] = useState({})
 
   useEffect(() => {
     setIsSupported('performance' in window && 'PerformanceObserver' in window)
@@ -139,9 +148,176 @@ export const usePerformance = () => {
     })
   }, [])
 
+  // Initialize Web Vitals observer
+  useEffect(() => {
+    if (!isSupported) return
+
+    // Initialize webVitals with default structure
+    setWebVitals({
+      lcp: null,
+      fid: null,
+      cls: null,
+      fcp: null,
+      ttfb: null
+    })
+
+    // Set up performance observers for web vitals
+    try {
+      // Largest Contentful Paint
+      new PerformanceObserver((list) => {
+        const entries = list.getEntries()
+        const lastEntry = entries[entries.length - 1]
+        setWebVitals((prev) => ({
+          ...prev,
+          lcp: {
+            value: lastEntry.startTime,
+            rating: lastEntry.startTime > 2500 ? 'poor' : 'good'
+          }
+        }))
+      }).observe({ entryTypes: ['largest-contentful-paint'] })
+
+      // First Input Delay
+      new PerformanceObserver((list) => {
+        const entries = list.getEntries()
+        entries.forEach((entry) => {
+          setWebVitals((prev) => ({
+            ...prev,
+            fid: {
+              value: entry.processingStart - entry.startTime,
+              rating:
+                entry.processingStart - entry.startTime > 100 ? 'poor' : 'good'
+            }
+          }))
+        })
+      }).observe({ entryTypes: ['first-input'] })
+
+      // Cumulative Layout Shift
+      new PerformanceObserver((list) => {
+        let clsValue = 0
+        list.getEntries().forEach((entry) => {
+          if (!entry.hadRecentInput) {
+            clsValue += entry.value
+          }
+        })
+        setWebVitals((prev) => ({
+          ...prev,
+          cls: { value: clsValue, rating: clsValue > 0.1 ? 'poor' : 'good' }
+        }))
+      }).observe({ entryTypes: ['layout-shift'] })
+    } catch (error) {
+      console.warn('Performance observers not fully supported:', error)
+    }
+  }, [isSupported])
+
+  // Start measurement function
+  const startMeasurement = useCallback(
+    (name) => {
+      if (!isSupported) return
+      const startTime = performance.now()
+      setMeasurements((prev) => ({
+        ...prev,
+        [name]: { startTime, endTime: null }
+      }))
+      return startTime
+    },
+    [isSupported]
+  )
+
+  // End measurement function
+  const endMeasurement = useCallback(
+    (name) => {
+      if (!isSupported) return null
+      const endTime = performance.now()
+      setMeasurements((prev) => {
+        const measurement = prev[name]
+        if (measurement) {
+          const duration = endTime - measurement.startTime
+          return {
+            ...prev,
+            [name]: { ...measurement, endTime, duration }
+          }
+        }
+        return prev
+      })
+      return measurements[name]?.duration
+    },
+    [isSupported, measurements]
+  )
+
+  // Measure component function
+  const measureComponent = useCallback(
+    (componentName, fn) => {
+      if (!isSupported) return fn()
+      const startTime = performance.now()
+      const result = fn()
+      const endTime = performance.now()
+
+      setCustomMetrics((prev) => ({
+        ...prev,
+        components: {
+          ...prev.components,
+          [componentName]: {
+            renderTime: endTime - startTime,
+            timestamp: new Date().toISOString()
+          }
+        }
+      }))
+
+      return result
+    },
+    [isSupported]
+  )
+
+  // Measure function
+  const measureFunction = useCallback(
+    (functionName, fn) => {
+      if (!isSupported) return fn()
+      const startTime = performance.now()
+      const result = fn()
+      const endTime = performance.now()
+
+      setCustomMetrics((prev) => ({
+        ...prev,
+        functions: {
+          ...prev.functions,
+          [functionName]: {
+            executionTime: endTime - startTime,
+            timestamp: new Date().toISOString()
+          }
+        }
+      }))
+
+      return result
+    },
+    [isSupported]
+  )
+
+  // Export metrics function
+  const exportMetrics = useCallback(() => {
+    return {
+      webVitals,
+      customMetrics,
+      measurements,
+      navigation: measureNavigation(),
+      resources: measureResources(),
+      memory: getMemoryInfo(),
+      timestamp: new Date().toISOString()
+    }
+  }, [
+    webVitals,
+    customMetrics,
+    measurements,
+    measureNavigation,
+    measureResources,
+    getMemoryInfo
+  ])
+
   return {
     isSupported,
     metrics,
+    webVitals,
+    customMetrics,
+    measurements,
     measureNavigation,
     measureResources,
     markTime,
@@ -151,6 +327,11 @@ export const usePerformance = () => {
     observePerformance,
     getNetworkInfo,
     measureFrameRate,
+    startMeasurement,
+    endMeasurement,
+    measureComponent,
+    measureFunction,
+    exportMetrics,
     performance: window.performance
   }
 }

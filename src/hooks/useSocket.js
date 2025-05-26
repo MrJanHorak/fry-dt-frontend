@@ -6,7 +6,9 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { io } from 'socket.io-client'
 
-const useSocket = (serverPath = 'http://localhost:3001') => {
+const useSocket = (
+  serverPath = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000'
+) => {
   const socketRef = useRef(null)
   const listenersRef = useRef(new Map())
 
