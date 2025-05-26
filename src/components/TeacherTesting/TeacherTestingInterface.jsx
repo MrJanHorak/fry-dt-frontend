@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import useSocket from '../../hooks/useSocket'
 import useSpeechSynthesis from '../../hooks/useSpeechSynthesis'
-import FryWordList from '../../assets/FryWordList.json'
+import fryWordService from '../../services/fryWordService'
+import { getProfileById } from '../../services/profileService'
 import styles from './styles.module.css'
 
 const TeacherTestingInterface = ({ user, room, socket }) => {
@@ -18,6 +19,7 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
   const [fryLevel, setFryLevel] = useState(1)
   const [studentResponses, setStudentResponses] = useState([])
   const [connectedStudents, setConnectedStudents] = useState([])
+  const [studentProfiles, setStudentProfiles] = useState({})
   const [sessionNotes, setSessionNotes] = useState('')
 
   // Assessment state
@@ -39,8 +41,7 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
 
   // Get available words for selected FRY level
   const getAvailableWords = useCallback(() => {
-    const levelKey = `level${fryLevel}`
-    return FryWordList[levelKey] || []
+    return fryWordService.getWordsByLevel(fryLevel)
   }, [fryLevel])
 
   // Handle socket events
@@ -63,6 +64,21 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
     const handleRoomUsers = (users) => {
       const students = users.filter((u) => u.user?.role === 'student')
       setConnectedStudents(students)
+
+      // Fetch profiles for connected students
+      students.forEach(async (student) => {
+        if (student.user?._id && !studentProfiles[student.user._id]) {
+          try {
+            const profile = await getProfileById(student.user._id)
+            setStudentProfiles((prev) => ({
+              ...prev,
+              [student.user._id]: profile
+            }))
+          } catch (error) {
+            console.log('Error fetching student profile:', error)
+          }
+        }
+      })
     }
 
     // Listen for pronunciation requests
@@ -203,13 +219,37 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
 
   // Select words by level preset
   const selectWordsByLevel = (level, count = 10) => {
-    const levelWords = getAvailableWords()
+    const levelWords = fryWordService.getWordsByLevel(level)
     const shuffled = [...levelWords].sort(() => Math.random() - 0.5)
     setSelectedWords(shuffled.slice(0, count))
   }
 
   const currentWord = selectedWords[currentWordIndex]
   const availableWords = getAvailableWords()
+
+  // Get struggling words for a student
+  const getStudentStrugglingWords = useCallback(
+    (studentId) => {
+      const profile = studentProfiles[studentId]
+      if (!profile || !profile.assessments) return []
+
+      // Get words that the student has struggled with (accuracy < 60%)
+      const strugglingWords = []
+      profile.assessments.forEach((assessment) => {
+        if (assessment.responses) {
+          assessment.responses.forEach((response) => {
+            if (response.accuracy < 0.6 || !response.correct) {
+              strugglingWords.push(response.word || assessment.word)
+            }
+          })
+        }
+      })
+
+      // Return unique struggling words, limited to last 5
+      return [...new Set(strugglingWords)].slice(0, 5)
+    },
+    [studentProfiles]
+  )
 
   if (!isConnected) {
     return (
@@ -240,6 +280,53 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
         <div className={styles.error}>
           <p>{error}</p>
           <button onClick={() => setError(null)}>Dismiss</button>
+        </div>
+      )}
+
+      {/* Connected Students Section */}
+      {connectedStudents.length > 0 && (
+        <div className={styles.connectedStudents}>
+          <h2>Connected Students ({connectedStudents.length})</h2>
+          <div className={styles.studentsList}>
+            {connectedStudents.map((student) => {
+              const studentId = student.user?._id
+              const studentName = student.user?.name || 'Unknown Student'
+              const strugglingWords = getStudentStrugglingWords(studentId)
+              const profile = studentProfiles[studentId]
+
+              return (
+                <div key={studentId} className={styles.studentCard}>
+                  <div className={styles.studentHeader}>
+                    <strong>{studentName}</strong>
+                    <span className={styles.studentLevel}>
+                      {profile?.grade ? `Grade ${profile.grade}` : 'No Grade'}
+                    </span>
+                  </div>
+
+                  {strugglingWords.length > 0 && (
+                    <div className={styles.strugglingWords}>
+                      <span className={styles.label}>Struggling with:</span>
+                      <div className={styles.wordTags}>
+                        {strugglingWords.map((word, index) => (
+                          <span key={index} className={styles.wordTag}>
+                            {word}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {strugglingWords.length === 0 && (
+                    <div className={styles.noStrugglingWords}>
+                      <span className={styles.noWordsText}>
+                        No struggling words identified
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
         </div>
       )}
 

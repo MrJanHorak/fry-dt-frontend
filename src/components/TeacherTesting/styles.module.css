@@ -484,6 +484,94 @@
   background: #e0e0e0;
 }
 
+/* Connected Students Styles */
+.connectedStudents {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.connectedStudents h2 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.studentsList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+.studentCard {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 15px;
+  background: #fafafa;
+}
+
+.studentHeader {
+  display: flex;
+  justify-content: between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.studentHeader strong {
+  color: #333;
+  font-size: 16px;
+  flex: 1;
+}
+
+.studentLevel {
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.strugglingWords {
+  margin-top: 8px;
+}
+
+.label {
+  font-size: 12px;
+  color: #666;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.wordTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.wordTag {
+  background: #ffebee;
+  color: #d32f2f;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid #ffcdd2;
+}
+
+.noStrugglingWords {
+  margin-top: 8px;
+}
+
+.noWordsText {
+  font-size: 12px;
+  color: #888;
+  font-style: italic;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .container {
