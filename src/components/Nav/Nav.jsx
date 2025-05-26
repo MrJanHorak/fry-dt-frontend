@@ -52,6 +52,11 @@ const Nav = (props) => {
                 </NavLink>
               </li>
               <li>
+                <NavLink to="/teacher-dashboard" onClick={() => closeMenu()}>
+                  Teacher Dashboard
+                </NavLink>
+              </li>
+              <li>
                 <NavLink to="/profile" onClick={() => closeMenu()}>
                   Profile
                 </NavLink>
@@ -89,6 +94,11 @@ const Nav = (props) => {
                 {' '}
                 <NavLink to="/study" onClick={() => closeMenu()}>
                   Study Words
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/student-practice" onClick={() => closeMenu()}>
+                  Practice Mode
                 </NavLink>
               </li>
               <li>
@@ -157,6 +167,9 @@ const Nav = (props) => {
                 <NavLink to="/study" onClick={() => closeMenu()}>
                   Study Words
                 </NavLink>
+                <NavLink to="/teacher-dashboard" onClick={() => closeMenu()}>
+                  Teacher Dashboard
+                </NavLink>
                 <NavLink to="/profile" onClick={() => closeMenu()}>
                   Profile
                 </NavLink>
@@ -182,6 +195,9 @@ const Nav = (props) => {
                 </NavLink>
                 <NavLink to="/study" onClick={() => closeMenu()}>
                   Study Words
+                </NavLink>
+                <NavLink to="/student-practice" onClick={() => closeMenu()}>
+                  Practice Mode
                 </NavLink>
                 <NavLink to="/profile" onClick={() => closeMenu()}>
                   Profile

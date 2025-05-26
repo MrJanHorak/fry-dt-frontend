@@ -12,7 +12,7 @@ export default defineConfig(({ command, mode }) => {
     server: {
       allowedHosts: ['.localhost'],
       host: true,
-      port: 3001
+      port: parseInt(process.env.VITE_PORT) || 3001
     },
     plugins: [
       react(),

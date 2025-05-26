@@ -25,13 +25,17 @@ async function addStudent(user) {
   try {
     const res = await fetch(`${BASE_URL}/addStudent`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${tokenService.getToken()}`
+      },
       body: JSON.stringify(user)
     })
     const json = await res.json()
     if (json.err) {
       throw new Error(json.err)
     }
+    return json
   } catch (err) {
     console.log(err)
     throw err

@@ -7,8 +7,23 @@ function setToken(token) {
 function getToken() {
   let token = localStorage.getItem('token')
   if (token) {
-    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64'))
-    if (payload.exp < Date.now() / 1000) {
+    try {
+      // Validate token structure before parsing
+      const parts = token.split('.')
+      if (parts.length !== 3) {
+        console.warn('Invalid token format: token does not have 3 parts')
+        localStorage.removeItem('token')
+        return null
+      }
+
+      const payload = JSON.parse(Buffer.from(parts[1], 'base64'))
+      if (payload.exp && payload.exp < Date.now() / 1000) {
+        console.log('Token expired, removing from storage')
+        localStorage.removeItem('token')
+        token = null
+      }
+    } catch (error) {
+      console.error('Error parsing token:', error)
       localStorage.removeItem('token')
       token = null
     }

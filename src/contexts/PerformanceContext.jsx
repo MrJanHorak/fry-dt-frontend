@@ -51,7 +51,8 @@ export const PerformanceProvider = ({ children }) => {
       const token = localStorage.getItem('token')
       if (!token) return
 
-      const response = await fetch('/api/performance/summary', {
+      const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+      const response = await fetch(`${baseURL}/api/performance/summary`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -75,7 +76,8 @@ export const PerformanceProvider = ({ children }) => {
       const token = localStorage.getItem('token')
       if (!token) return
 
-      const response = await fetch('/api/performance/alerts', {
+      const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+      const response = await fetch(`${baseURL}/api/performance/alerts`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'

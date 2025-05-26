@@ -19,6 +19,8 @@ import Study from './pages/Study/Study'
 import Profile from './pages/Profile/Profile'
 import Chat from './components/Chat/Chat'
 import MonitoringDashboard from './components/MonitoringDashboard/MonitoringDashboard'
+import TeacherDashboard from './components/TeacherDashboard/TeacherDashboard'
+import StudentPracticeMode from './components/StudentPractice/StudentPracticeMode'
 
 const socket = io.connect('http://localhost:3000')
 
@@ -86,6 +88,14 @@ const App = () => {
             }
           />
           <Route path="/profile" element={<Profile user={user} />} />
+          <Route
+            path="/teacher-dashboard"
+            element={<TeacherDashboard user={user} />}
+          />
+          <Route
+            path="/student-practice"
+            element={<StudentPracticeMode user={user} />}
+          />
 
           {/* <Route path='/admin' element={<Admin user={user} />} /> */}
         </Routes>
