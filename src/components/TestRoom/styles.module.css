@@ -126,6 +126,70 @@
   font-weight: 600;
 }
 
+.studentLaunchCard {
+  width: 100%;
+  padding: 28px 24px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #f4f7ff 0%, #e7efff 100%);
+  border: 1px solid #d0dcff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.studentLaunchCard h2 {
+  margin: 0;
+  color: #1d275f;
+  font-size: clamp(2rem, 6vw, 2.8rem);
+  line-height: 0.95;
+}
+
+.studentLaunchCard p {
+  margin: 0;
+  color: #51617f;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.studentPulseGraphic {
+  position: relative;
+  width: 112px;
+  height: 112px;
+}
+
+.studentPulseGraphic span {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(63, 73, 204, 0.24);
+  animation: inviteRipple 2.4s ease-out infinite;
+}
+
+.studentPulseGraphic span:nth-child(2) {
+  transform: scale(0.72);
+  animation-delay: 0.2s;
+}
+
+.studentPulseGraphic span:nth-child(3) {
+  transform: scale(0.46);
+  background: linear-gradient(135deg, #6c7cff 0%, #3f49cc 100%);
+  box-shadow: 0 14px 28px rgba(63, 73, 204, 0.28);
+}
+
+@keyframes inviteRipple {
+  0% {
+    opacity: 0.85;
+    transform: scale(0.76);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+}
+
 .sessionCode {
   font-size: 24px;
   font-weight: 700;

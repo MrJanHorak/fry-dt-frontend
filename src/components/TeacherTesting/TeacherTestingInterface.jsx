@@ -50,12 +50,18 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
 
     // Listen for student responses
     const handleStudentResponse = (data) => {
-      console.log('Received student response:', data)
       setStudentResponses((prev) => [
-        ...prev,
+        ...prev.filter(
+          (response) =>
+            !(
+              response.sessionId === data.sessionId &&
+              response.studentId === data.studentId &&
+              response.word === data.word
+            )
+        ),
         {
           ...data,
-          id: `${data.studentId}_${Date.now()}`
+          id: `${data.sessionId}_${data.studentId}_${data.word}`
         }
       ])
     }
@@ -95,13 +101,14 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
     on('student_test_response', handleStudentResponse)
     on('chatroom_users', handleRoomUsers)
     on('pronunciation_requested', handlePronunciationRequest)
+    emit('request_room_users', { room })
 
     return () => {
       off('student_test_response', handleStudentResponse)
       off('chatroom_users', handleRoomUsers)
       off('pronunciation_requested', handlePronunciationRequest)
     }
-  }, [isConnected, on, off, speak, speechSupported])
+  }, [isConnected, on, off, emit, room, speak, speechSupported])
 
   // Start new test session
   const startTestSession = () => {
@@ -147,16 +154,12 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
     }
 
     emit('send_test_word', wordData)
-
-    // Clear previous responses for this word
-    setStudentResponses([])
   }
 
   // Move to next word
   const nextWord = () => {
     if (currentWordIndex < selectedWords.length - 1) {
       setCurrentWordIndex((prev) => prev + 1)
-      setStudentResponses([])
     }
   }
 
@@ -164,7 +167,6 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
   const previousWord = () => {
     if (currentWordIndex > 0) {
       setCurrentWordIndex((prev) => prev - 1)
-      setStudentResponses([])
     }
   }
 
@@ -188,6 +190,16 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
     setCurrentAssessment(null)
     setAssessmentNotes('')
     setWordScore(null)
+  }
+
+  const openAssessment = (response) => {
+    setCurrentAssessment(response)
+    setAssessmentNotes(response.teacherNotes || '')
+    setWordScore(
+      typeof response.teacherRecognized === 'boolean'
+        ? response.teacherRecognized
+        : Boolean(response.recognized)
+    )
   }
 
   // End test session
@@ -226,13 +238,55 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
 
   // Select words by level preset
   const selectWordsByLevel = (level, count = 10) => {
-    const levelWords = fryWordService.getWordsByLevel(level)
+    const levelWords = [...new Set(fryWordService.getWordsByLevel(level))]
     const shuffled = [...levelWords].sort(() => Math.random() - 0.5)
     setSelectedWords(shuffled.slice(0, count))
   }
 
   const currentWord = selectedWords[currentWordIndex]
-  const availableWords = getAvailableWords()
+  const currentWordResponses = studentResponses.filter(
+    (response) =>
+      response.sessionId === currentSession?.sessionId &&
+      response.word === currentWord
+  )
+  const availableWords = [...new Set(getAvailableWords())]
+  const quickSelectCounts =
+    fryLevel <= 2 ? [3, 5, 8] : fryLevel <= 5 ? [5, 8, 10] : [5, 10, 15]
+  const recommendedWordCount = fryLevel <= 2 ? 5 : fryLevel <= 5 ? 8 : 10
+  const showEarlyReaderGuidance =
+    testType === 'recognition' && fryLevel <= 2 && selectedWords.length > recommendedWordCount
+
+  const formatResponseTime = (responseTime) => {
+    if (typeof responseTime !== 'number' || Number.isNaN(responseTime)) {
+      return '--'
+    }
+
+    if (responseTime < 1000) {
+      return `${responseTime} ms`
+    }
+
+    return `${(responseTime / 1000).toFixed(1)} s`
+  }
+
+  const getRecognitionSpeedLabel = (responseTime, responseText) => {
+    if (responseText === 'No spoken response') {
+      return 'No response'
+    }
+
+    if (typeof responseTime !== 'number' || Number.isNaN(responseTime)) {
+      return 'Pending'
+    }
+
+    if (responseTime <= 1500) {
+      return 'Quick recognition'
+    }
+
+    if (responseTime <= 3000) {
+      return 'Steady recognition'
+    }
+
+    return 'Slow recognition'
+  }
 
   // Get struggling words for a student
   const getStudentStrugglingWords = useCallback(
@@ -372,21 +426,22 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
 
           <div className={styles.quickSelect}>
             <h3>Quick Select:</h3>
-            <button onClick={() => selectWordsByLevel(fryLevel, 5)}>
-              Random 5 Words
-            </button>
-            <button onClick={() => selectWordsByLevel(fryLevel, 10)}>
-              Random 10 Words
-            </button>
-            <button onClick={() => selectWordsByLevel(fryLevel, 20)}>
-              Random 20 Words
-            </button>
+            {quickSelectCounts.map((count) => (
+              <button key={count} onClick={() => selectWordsByLevel(fryLevel, count)}>
+                Random {count} Words
+              </button>
+            ))}
+            <p className={styles.guidanceText}>
+              {fryLevel <= 2
+                ? 'Early-reader tip: start with 3 to 5 recognition words so the student can focus on saying each word aloud.'
+                : 'Keep recognition rounds short enough for the student to stay focused and respond out loud.'}
+            </p>
           </div>
 
           <div className={styles.wordGrid}>
-            {availableWords.map((word) => (
+            {availableWords.map((word, index) => (
               <div
-                key={word}
+                key={`${word}-${index}`}
                 className={`${styles.wordCard} ${
                   selectedWords.includes(word) ? styles.selected : ''
                 }`}
@@ -401,11 +456,16 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
             <h3>Selected Words ({selectedWords.length}):</h3>
             <div className={styles.selectedList}>
               {selectedWords.map((word, index) => (
-                <span key={word} className={styles.selectedWord}>
+                <span key={`${word}-${index}`} className={styles.selectedWord}>
                   {index + 1}. {word}
                 </span>
               ))}
             </div>
+            {showEarlyReaderGuidance && (
+              <p className={styles.selectionWarning}>
+                This is a long recognition round for a beginning reader. A shorter set will usually give cleaner speech responses.
+              </p>
+            )}
           </div>
 
           <button
@@ -456,16 +516,18 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
 
           <div className={styles.studentResponses}>
             <h3>Student Responses:</h3>
-            {studentResponses.length === 0 ? (
+            {currentWordResponses.length === 0 ? (
               <p>Waiting for student responses...</p>
             ) : (
               <div className={styles.responsesList}>
-                {studentResponses.map((response) => (
+                {currentWordResponses.map((response) => (
                   <div key={response.id} className={styles.responseCard}>
                     <div className={styles.responseHeader}>
                       <strong>{response.studentName}</strong>
                       <span className={styles.responseTime}>
-                        {response.responseTime}ms
+                        {formatResponseTime(response.responseTime)}
+                        {testType === 'recognition' &&
+                          ` • ${getRecognitionSpeedLabel(response.responseTime, response.response)}`}
                       </span>
                     </div>
 
@@ -492,9 +554,9 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
 
                     <button
                       className={styles.assessButton}
-                      onClick={() => setCurrentAssessment(response)}
+                      onClick={() => openAssessment(response)}
                     >
-                      Add Assessment
+                      Review / Update
                     </button>
                   </div>
                 ))}
@@ -513,7 +575,7 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
       {currentAssessment && (
         <div className={styles.assessmentModal}>
           <div className={styles.modalContent}>
-            <h3>Assess Response</h3>
+            <h3>Update Assessment</h3>
             <p>
               <strong>Student:</strong> {currentAssessment.studentName}
               <br />
@@ -525,7 +587,17 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
                   <br />
                 </>
               )}
-              <strong>Response Time:</strong> {currentAssessment.responseTime}ms
+              <strong>Response Time:</strong>{' '}
+              {formatResponseTime(currentAssessment.responseTime)}
+              <br />
+              <strong>Recognition Speed:</strong>{' '}
+              {getRecognitionSpeedLabel(
+                currentAssessment.responseTime,
+                currentAssessment.response
+              )}
+            </p>
+            <p className={styles.assessmentHint}>
+              The computer response is already saved. Use this panel to confirm or update it.
             </p>
 
             <div className={styles.assessmentForm}>
@@ -563,7 +635,7 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
                   }}
                   disabled={wordScore === null}
                 >
-                  Save Assessment
+                  Save Update
                 </button>
                 <button onClick={() => setCurrentAssessment(null)}>
                   Cancel

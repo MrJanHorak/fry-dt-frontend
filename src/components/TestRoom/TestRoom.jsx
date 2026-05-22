@@ -1,10 +1,17 @@
 import { useNavigate } from 'react-router-dom'
 import styles from './styles.module.css'
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import TeacherTestingInterface from '../TeacherTesting/TeacherTestingInterface'
 import StudentTestingInterface from '../StudentTesting/StudentTestingInterface'
 
-const TestRoom = ({ user, room, setRoom, socket }) => {
+const TestRoom = ({
+  user,
+  room,
+  setRoom,
+  socket,
+  autoJoinSession,
+  clearAutoJoinSession
+}) => {
   const navigate = useNavigate()
   const [hasJoinedRoom, setHasJoinedRoom] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
@@ -37,20 +44,49 @@ const TestRoom = ({ user, room, setRoom, socket }) => {
     }
   }
 
+  const updateTestingPresence = useCallback(
+    (nextRoom) => {
+      socket.emit('update_presence', {
+        profileId: user.profile || user._id,
+        user,
+        currentPath: '/testing',
+        context: 'testing-center',
+        room: nextRoom,
+        invitedRoom: null
+      })
+    },
+    [socket, user]
+  )
+
+  const connectToRoom = useCallback(
+    (requestedRoom = room) => {
+      const nextRoom = normalizeRoom(requestedRoom)
+
+      if (nextRoom !== '' && username !== '') {
+        setIsConnecting(true)
+        setRoom(nextRoom)
+        socket.emit('join_room', { username, user, room: nextRoom })
+        updateTestingPresence(nextRoom)
+
+        setTimeout(() => {
+          setHasJoinedRoom(true)
+          setIsConnecting(false)
+          clearAutoJoinSession?.()
+        }, 1000)
+      }
+    },
+    [room, username, setRoom, socket, user, updateTestingPresence, clearAutoJoinSession]
+  )
+
   const joinRoom = () => {
-    const nextRoom = normalizeRoom(room)
-
-    if (nextRoom !== '' && username !== '') {
-      setIsConnecting(true)
-      setRoom(nextRoom)
-      socket.emit('join_room', { username, user, room: nextRoom })
-
-      setTimeout(() => {
-        setHasJoinedRoom(true)
-        setIsConnecting(false)
-      }, 1000)
-    }
+    connectToRoom(room)
   }
+
+  useEffect(() => {
+    if (!autoJoinSession?.room || hasJoinedRoom || isConnecting) return
+
+    connectToRoom(autoJoinSession.room)
+  }, [autoJoinSession, hasJoinedRoom, isConnecting, connectToRoom])
 
   if (hasJoinedRoom) {
     if (isTeacher) {
@@ -66,110 +102,123 @@ const TestRoom = ({ user, room, setRoom, socket }) => {
         <h1>Testing Center</h1>
         <p className={styles.subtitle}>
           {isTeacher
-            ? 'Create or share a session code to invite students into a live test'
-            : 'Enter the session code your teacher shared with you'}
+            ? 'Open a live testing room and pull in the students from your online roster'
+            : 'Your teacher will bring you in automatically'}
         </p>
 
-        <div className={styles.userInfo}>
-          <span>Role: {user.role}</span>
-          <span>Name: {user.name}</span>
-        </div>
-
-        <div className={styles.roomField}>
-          <input
-            className={styles.input}
-            type="text"
-            value={room}
-            onChange={(e) => {
-              setRoom(e.target.value.toUpperCase())
-              setCopyMessage('')
-            }}
-            disabled={isConnecting}
-            placeholder={
-              isTeacher
-                ? 'Create or paste a session code'
-                : 'Enter session code'
-            }
-            autoCapitalize="characters"
-            autoCorrect="off"
-            autoComplete="off"
-            spellCheck={false}
-          />
-
-          {isTeacher && (
-            <button
-              type="button"
-              className={styles.secondaryAction}
-              onClick={generateRoomCode}
-              disabled={isConnecting}
-            >
-              Generate Session Code
-            </button>
-          )}
-        </div>
-
-        {isTeacher && room && (
-          <div className={styles.sessionShareCard}>
-            <span className={styles.helperText}>
-              Share this code with students:
-            </span>
-            <div className={styles.sessionCode}>{room}</div>
-            <div className={styles.actionRow}>
-              <button
-                type="button"
-                className={styles.secondaryAction}
-                onClick={copyRoomCode}
-              >
-                Copy Code
-              </button>
-              {copyMessage && (
-                <span className={styles.copyMessage}>{copyMessage}</span>
-              )}
+        {autoJoinSession?.room && !hasJoinedRoom && (
+          <div className={styles.studentLaunchCard}>
+            <div className={styles.studentPulseGraphic}>
+              <span></span>
+              <span></span>
+              <span></span>
             </div>
+            <span className={styles.helperText}>
+              {autoJoinSession.teacherName
+                ? `${autoJoinSession.teacherName} is bringing you in.`
+                : 'Teacher invitation received.'}
+            </span>
+            <span className={styles.copyMessage}>Connecting automatically...</span>
           </div>
         )}
 
-        <button
-          className="btn btn-secondary"
-          style={{ width: '100%' }}
-          onClick={joinRoom}
-          disabled={!normalizeRoom(room) || isConnecting}
-        >
-          {isConnecting
-            ? 'Connecting...'
-            : isTeacher
-              ? 'Open Session'
-              : 'Join Session'}
-        </button>
-
-        <div className={styles.instructions}>
-          <h3>Instructions:</h3>
-          {isTeacher ? (
-            <ul>
-              <li>Create a session code or use one your class already knows</li>
-              <li>Share the code with students before starting the test</li>
-              <li>Open the session to access the teacher testing interface</li>
-              <li>
-                You can send words, assess responses, and monitor progress live
-              </li>
-              <li>
-                Students must join with the same session code to participate
-              </li>
-              <li>
-                Use the assessment tools to track progress during the session
-              </li>
-            </ul>
-          ) : (
-            <ul>
-              <li>Enter the exact session code your teacher shared</li>
-              <li>Wait for your teacher to start a test session</li>
-              <li>Follow the on-screen instructions for each test</li>
-              <li>
-                Make sure your microphone is working for pronunciation tests
-              </li>
-            </ul>
-          )}
+        <div className={styles.userInfo}>
+          {isTeacher ? <span>Role: {user.role}</span> : <span>{user.name}</span>}
+          {isTeacher && <span>Name: {user.name}</span>}
         </div>
+
+        {isTeacher ? (
+          <>
+            <div className={styles.roomField}>
+              <input
+                className={styles.input}
+                type="text"
+                value={room}
+                onChange={(e) => {
+                  setRoom(e.target.value.toUpperCase())
+                  setCopyMessage('')
+                }}
+                disabled={isConnecting}
+                placeholder="Create or paste a session code"
+                autoCapitalize="characters"
+                autoCorrect="off"
+                autoComplete="off"
+                spellCheck={false}
+              />
+
+              <button
+                type="button"
+                className={styles.secondaryAction}
+                onClick={generateRoomCode}
+                disabled={isConnecting}
+              >
+                Generate Session Code
+              </button>
+            </div>
+
+            {room && (
+              <div className={styles.sessionShareCard}>
+                <span className={styles.helperText}>
+                  Share this code with students:
+                </span>
+                <div className={styles.sessionCode}>{room}</div>
+                <div className={styles.actionRow}>
+                  <button
+                    type="button"
+                    className={styles.secondaryAction}
+                    onClick={copyRoomCode}
+                  >
+                    Copy Code
+                  </button>
+                  {copyMessage && (
+                    <span className={styles.copyMessage}>{copyMessage}</span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <button
+              className="btn btn-secondary"
+              style={{ width: '100%' }}
+              onClick={joinRoom}
+              disabled={!normalizeRoom(room) || isConnecting}
+            >
+              {isConnecting ? 'Connecting...' : 'Open Session'}
+            </button>
+
+            <div className={styles.instructions}>
+              <h3>Instructions:</h3>
+              <ul>
+                <li>Use the teacher dashboard to see which roster students are online</li>
+                <li>Launch the testing center from the dashboard to pull online students in</li>
+                <li>Open the session to access the teacher testing interface</li>
+                <li>
+                  You can send words, assess responses, and monitor progress live
+                </li>
+                <li>
+                  Session codes remain available as a fallback when automatic pull-in is not possible
+                </li>
+                <li>
+                  Use the assessment tools to track progress during the session
+                </li>
+              </ul>
+            </div>
+          </>
+        ) : (
+          <div className={styles.studentLaunchCard}>
+            <div className={styles.studentPulseGraphic}>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <h2>{isConnecting ? 'Joining Test' : 'Wait Here'}</h2>
+            <p>
+              {isConnecting
+                ? 'Opening your test now.'
+                : 'Stay on this screen. Your teacher will open the test for you.'}
+            </p>
+          </div>
+        )}
 
         <button
           className={styles.backButton}

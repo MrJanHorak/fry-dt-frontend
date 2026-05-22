@@ -900,6 +900,227 @@
   border-radius: 4px;
 }
 
+.monitoring {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.monitoringHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.monitoringHeader h3 {
+  margin: 0;
+  color: #2c3e50;
+}
+
+.monitoringControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.metricsOverview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.metricValue {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.good {
+  color: #1f7a45;
+}
+
+.ok {
+  color: #856404;
+}
+
+.poor,
+.alert {
+  color: #a61e2f;
+}
+
+.rosterSection {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.rosterHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.rosterHeader h4 {
+  margin: 0 0 6px 0;
+  color: #2c3e50;
+}
+
+.rosterHeader p {
+  margin: 0;
+  color: #6c757d;
+  line-height: 1.5;
+}
+
+.rosterActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.primaryButton,
+.secondaryButton {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primaryButton {
+  background: #2f6fed;
+  color: white;
+}
+
+.primaryButton:disabled {
+  background: #c7d2e8;
+  cursor: not-allowed;
+}
+
+.secondaryButton {
+  background: #edf2ff;
+  color: #2f4fad;
+}
+
+.rosterNotice {
+  background: #eef6ff;
+  color: #24508f;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #c9dcff;
+}
+
+.rosterGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.rosterCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #dce3f0;
+  background: #fbfcff;
+}
+
+.onlineCard {
+  border-color: #c7ead5;
+  background: #f8fffb;
+}
+
+.offlineCard {
+  opacity: 0.8;
+}
+
+.rosterCardHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.rosterCardHeader h5 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+.presenceBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.onlineBadge {
+  background: #dcf6e6;
+  color: #1f7a45;
+}
+
+.offlineBadge {
+  background: #eceff4;
+  color: #596273;
+}
+
+.rosterDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #4f5b68;
+  font-size: 14px;
+}
+
+.telemetryHeader {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+
+.telemetryHeader h4 {
+  margin: 0 0 6px 0;
+  color: #2c3e50;
+}
+
+.telemetryHeader p {
+  margin: 0;
+  color: #6c757d;
+}
+
+.alertSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.alertList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.studentName {
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.alertReasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .noSessions {
   text-align: center;
   padding: 60px 20px;
@@ -1036,6 +1257,16 @@
   .sessionList {
     grid-template-columns: 1fr;
     gap: 15px;
+  }
+
+  .monitoringHeader,
+  .rosterHeader {
+    flex-direction: column;
+  }
+
+  .rosterActions,
+  .monitoringControls {
+    width: 100%;
   }
 
   .sessionMetrics {

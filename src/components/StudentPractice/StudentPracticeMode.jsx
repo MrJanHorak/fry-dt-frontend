@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import useSpeechRecognition from '../../hooks/useSpeechRecognition'
+import useSocket from '../../hooks/useSocket'
 import * as fryWordService from '../../services/fryWordService'
 import * as profileService from '../../services/profileService'
 import styles from './styles.module.css'
 
-const StudentPracticeMode = () => {
+const StudentPracticeMode = ({ socket }) => {
   const { user } = useAuth()
+  const { emit } = useSocket(socket)
   const [currentLevel, setCurrentLevel] = useState(1)
   const [practiceWords, setPracticeWords] = useState([])
   const [currentWordIndex, setCurrentWordIndex] = useState(0)
@@ -57,6 +59,32 @@ const StudentPracticeMode = () => {
       )
     }
   }, [studentProgress])
+
+  useEffect(() => {
+    if (!user?.profile) return
+
+    emit('update_presence', {
+      profileId: user.profile || user._id,
+      user,
+      currentPath: '/student-practice',
+      context: sessionActive ? 'practice-session' : 'practice-lobby',
+      practiceMode,
+      practiceSessionActive: sessionActive,
+      currentWord: sessionActive ? practiceWords[currentWordIndex] || null : null,
+      wordsCompleted: score.total,
+      totalWords: practiceWords.length,
+      isListening
+    })
+  }, [
+    emit,
+    user,
+    sessionActive,
+    practiceMode,
+    practiceWords,
+    currentWordIndex,
+    score.total,
+    isListening
+  ])
 
   const loadStudentData = async () => {
     try {
@@ -260,6 +288,27 @@ const StudentPracticeMode = () => {
     getResponseTime,
     handleResponse,
     stopListening
+  ])
+
+  useEffect(() => {
+    if (
+      practiceMode !== 'pronunciation' ||
+      !sessionActive ||
+      !transcript ||
+      isListening ||
+      feedback
+    ) {
+      return
+    }
+
+    handleSpeechResponse()
+  }, [
+    practiceMode,
+    sessionActive,
+    transcript,
+    isListening,
+    feedback,
+    handleSpeechResponse
   ])
 
   const handleTextResponse = useCallback(

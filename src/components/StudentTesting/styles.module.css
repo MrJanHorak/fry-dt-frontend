@@ -2,37 +2,45 @@
   padding: 20px;
   max-width: 800px;
   margin: 0 auto;
-  background-color: #f5f5f5;
+  background:
+    radial-gradient(circle at top, rgba(77, 170, 255, 0.16), transparent 35%),
+    linear-gradient(180deg, #f4f8ff 0%, #eef3fb 100%);
   min-height: 100vh;
 }
 
 .header {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.92);
+  padding: 18px 20px;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(34, 67, 122, 0.08);
   margin-bottom: 20px;
   text-align: center;
+  border: 1px solid rgba(103, 145, 222, 0.12);
 }
 
 .header h1 {
-  margin: 0 0 10px 0;
-  color: #333;
+  margin: 0 0 12px 0;
+  color: #20355d;
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 0.95;
 }
 
 .studentInfo {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 12px;
   font-size: 14px;
   color: #666;
   flex-wrap: wrap;
 }
 
 .studentInfo span {
-  padding: 5px 10px;
-  background: #e3f2fd;
-  border-radius: 4px;
+  padding: 8px 14px;
+  background: #dfeeff;
+  border-radius: 999px;
+  color: #2a4a7b;
+  font-weight: 700;
+  text-transform: capitalize;
 }
 
 .notification {
@@ -70,83 +78,159 @@
 /* Waiting States */
 .waitingRoom,
 .waitingForWord {
-  background: white;
-  padding: 40px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.94);
+  padding: 44px 28px;
+  border-radius: 24px;
+  box-shadow: 0 18px 40px rgba(34, 67, 122, 0.08);
   text-align: center;
+  border: 1px solid rgba(103, 145, 222, 0.12);
 }
 
 .waitingCard h2,
 .waitingForWord h2 {
-  color: #333;
-  margin-bottom: 15px;
+  color: #20355d;
+  margin-bottom: 0;
+  font-size: clamp(2rem, 6vw, 2.8rem);
+  line-height: 0.95;
 }
 
 .waitingCard p,
 .waitingForWord p {
-  color: #666;
-  margin-bottom: 30px;
-  font-size: 16px;
+  color: #5b6c86;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
 }
 
-.loadingSpinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #e3f2fd;
-  border-top: 4px solid #2196f3;
+.signalOrbit {
+  position: relative;
+  width: 144px;
+  height: 144px;
+  margin: 0 auto 24px;
+}
+
+.signalRing,
+.signalRing::before,
+.signalRing::after {
+  position: absolute;
+  inset: 0;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto;
+  border: 2px solid rgba(65, 149, 255, 0.22);
+  animation: ripple 2.4s ease-out infinite;
+  content: '';
 }
 
-@keyframes spin {
+.signalRing::before {
+  transform: scale(0.78);
+  animation-delay: 0.35s;
+}
+
+.signalRing::after {
+  transform: scale(0.58);
+  animation-delay: 0.7s;
+}
+
+.signalCore {
+  position: absolute;
+  inset: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5aa8ff 0%, #2f6df3 100%);
+  color: white;
+  font-size: 52px;
+  box-shadow: 0 18px 30px rgba(47, 109, 243, 0.28);
+}
+
+.waitingDots {
+  display: inline-flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.waitingDots span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #91c5ff;
+  animation: bounceDot 1.1s ease-in-out infinite;
+}
+
+.waitingDots span:nth-child(2) {
+  animation-delay: 0.16s;
+}
+
+.waitingDots span:nth-child(3) {
+  animation-delay: 0.32s;
+}
+
+@keyframes ripple {
   0% {
-    transform: rotate(0deg);
+    opacity: 0.95;
+    transform: scale(0.82);
   }
   100% {
-    transform: rotate(360deg);
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes bounceDot {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translateY(-8px);
+    opacity: 1;
   }
 }
 
 /* Testing Area */
 .testingArea {
-  background: white;
+  background: rgba(255, 255, 255, 0.94);
   padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 24px;
+  box-shadow: 0 18px 40px rgba(34, 67, 122, 0.08);
+  border: 1px solid rgba(103, 145, 222, 0.12);
 }
 
 .wordTest h2 {
   text-align: center;
-  color: #333;
+  color: #20355d;
   margin-bottom: 20px;
-  font-size: 24px;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  line-height: 0.95;
 }
 
 /* Word Display */
 .wordDisplay {
   text-align: center;
   margin: 30px 0;
-  padding: 30px;
-  background: #e3f2fd;
-  border-radius: 12px;
-  border: 3px solid #2196f3;
+  padding: 34px 24px;
+  background: linear-gradient(180deg, #f6fbff 0%, #dfefff 100%);
+  border-radius: 24px;
+  border: 3px solid #67b1ff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 .displayedWord {
-  font-size: 3em;
+  font-size: clamp(4rem, 11vw, 6.5rem);
   font-weight: bold;
-  color: #1976d2;
+  color: #1d5ed7;
   margin-bottom: 15px;
   text-transform: lowercase;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
+  line-height: 0.9;
 }
 
 .wordDisplay p {
-  color: #666;
-  font-size: 16px;
+  color: #4f6787;
+  font-size: 18px;
   margin: 0;
+  font-weight: 700;
 }
 
 /* Recognition Test */
@@ -187,6 +271,15 @@
   transition: background 0.2s;
 }
 
+.hearWordButton,
+.startSpeechButton,
+.responseSubmitted p {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
 .hearWordButton:hover:not(:disabled) {
   background: #f57c00;
 }
@@ -198,6 +291,50 @@
 
 .speechControls {
   margin: 30px 0;
+}
+
+.countdownPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.countdownRing {
+  width: 142px;
+  height: 142px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at center, white 0 46%, transparent 47%),
+    conic-gradient(#2f6df3 0deg, #2f6df3 280deg, #d9e9ff 280deg 360deg);
+  box-shadow: 0 16px 28px rgba(47, 109, 243, 0.18);
+  animation: countdownPulse 1s ease-in-out infinite;
+}
+
+.countdownRing span {
+  width: 102px;
+  height: 102px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  color: #20408b;
+  font-size: 48px;
+  font-weight: 800;
+}
+
+@keyframes countdownPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
 }
 
 .startSpeechButton {
@@ -224,9 +361,12 @@
 
 .listeningIndicator {
   padding: 30px;
-  background: #e8f5e8;
-  border-radius: 12px;
-  border: 2px solid #4caf50;
+  background: linear-gradient(180deg, #ecfff0 0%, #dbf7e1 100%);
+  border-radius: 18px;
+  border: 2px solid #59bf74;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .microphoneActive {
@@ -263,12 +403,6 @@
   }
 }
 
-.listeningIndicator p {
-  color: #2e7d32;
-  font-weight: 600;
-  margin-bottom: 15px;
-}
-
 .stopButton {
   padding: 10px 20px;
   background: #f44336;
@@ -285,8 +419,8 @@
 
 .transcriptDisplay {
   padding: 20px;
-  background: #f8f9fa;
-  border-radius: 8px;
+  background: #f7fbff;
+  border-radius: 16px;
   margin: 20px 0;
   border-left: 4px solid #4caf50;
 }
@@ -360,18 +494,19 @@
 
 /* Response Submitted */
 .responseSubmitted {
-  padding: 20px;
-  background: #e8f5e8;
-  border-radius: 8px;
+  padding: 18px;
+  background: linear-gradient(180deg, #f2fff5 0%, #e5f8ea 100%);
+  border-radius: 16px;
   border: 2px solid #4caf50;
   margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.responseSubmitted p {
+.responseSubmitted svg {
   color: #2e7d32;
-  font-weight: 600;
-  margin: 0;
-  font-size: 16px;
+  font-size: 30px;
 }
 
 /* Browser Warning */
@@ -388,6 +523,34 @@
 .browserWarning p {
   margin: 0;
   font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 14px;
+  }
+
+  .header,
+  .testingArea,
+  .waitingRoom,
+  .waitingForWord {
+    border-radius: 20px;
+  }
+
+  .displayedWord {
+    letter-spacing: 1px;
+  }
+
+  .countdownRing {
+    width: 126px;
+    height: 126px;
+  }
+
+  .countdownRing span {
+    width: 90px;
+    height: 90px;
+    font-size: 40px;
+  }
 }
 
 /* Responsive Design */

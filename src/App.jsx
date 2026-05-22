@@ -1,5 +1,11 @@
-import { useState } from 'react'
-import { Routes, Route, useNavigate, Navigate } from 'react-router-dom'
+import { useState, useEffect, useCallback } from 'react'
+import {
+  Routes,
+  Route,
+  useNavigate,
+  Navigate,
+  useLocation
+} from 'react-router-dom'
 import io from 'socket.io-client'
 import './App.css'
 
@@ -22,6 +28,42 @@ import StudentPracticeMode from './components/StudentPractice/StudentPracticeMod
 
 const socket = io.connect('http://localhost:3000')
 
+const generateSessionCode = () =>
+  `SESSION-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
+
+const getPresenceContext = (pathname, role) => {
+  if (pathname.startsWith('/teacher-dashboard')) return 'teacher-dashboard'
+  if (pathname.startsWith('/student-practice')) return 'practice-lobby'
+  if (pathname.startsWith('/testing')) return 'testing-lobby'
+  if (pathname.startsWith('/study')) return role === 'student' ? 'study' : 'online'
+  if (pathname.startsWith('/profile')) return 'profile'
+  if (pathname.startsWith('/chat')) return 'chat'
+  return 'online'
+}
+
+const buildPresencePayload = (user, pathname, overrides = {}) => ({
+  profileId: user?.profile || user?._id,
+  user: {
+    _id: user?._id,
+    profile: user?.profile,
+    name: user?.name,
+    role: user?.role,
+    isAdmin: user?.isAdmin
+  },
+  status: 'online',
+  currentPath: overrides.currentPath || pathname,
+  context: overrides.context || getPresenceContext(pathname, user?.role),
+  practiceMode: null,
+  practiceSessionActive: false,
+  currentWord: null,
+  wordsCompleted: 0,
+  totalWords: 0,
+  isListening: false,
+  room: null,
+  invitedRoom: null,
+  ...overrides
+})
+
 /**
  * The main component of the application.
  *
@@ -30,9 +72,11 @@ const socket = io.connect('http://localhost:3000')
  */
 const App = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const { user, refreshUser, logout } = useAuth()
   const [username, setUsername] = useState('')
   const [room, setRoom] = useState('')
+  const [autoJoinSession, setAutoJoinSession] = useState(null)
 
   const isAdmin = Boolean(user?.isAdmin)
   const isTeacher = isAdmin || user?.role === 'teacher'
@@ -45,14 +89,117 @@ const App = () => {
   const renderRoleProtectedRoute = (allowed, element) =>
     allowed ? element : <Navigate to={user ? '/' : '/signin'} replace />
 
+  const emitPresence = useCallback(
+    (eventName, overrides = {}) => {
+      if (!user || !socket.connected) return
+
+      socket.emit(
+        eventName,
+        buildPresencePayload(user, location.pathname, overrides)
+      )
+    },
+    [user, location.pathname]
+  )
+
+  useEffect(() => {
+    if (!user) return undefined
+
+    const registerPresence = () => {
+      socket.emit('register_presence', buildPresencePayload(user, location.pathname))
+    }
+
+    socket.on('connect', registerPresence)
+
+    if (socket.connected) {
+      registerPresence()
+    }
+
+    return () => {
+      socket.off('connect', registerPresence)
+    }
+  }, [user, location.pathname])
+
+  useEffect(() => {
+    emitPresence('update_presence')
+  }, [emitPresence])
+
+  useEffect(() => {
+    if (!user || user.role !== 'student') return undefined
+
+    const handleTestingCenterInvitation = (invitation) => {
+      if (!invitation?.room) return
+
+      setRoom(invitation.room)
+      setAutoJoinSession({
+        room: invitation.room,
+        teacherName: invitation.teacherName || '',
+        sentAt: invitation.sentAt || Date.now(),
+        source: 'teacher-invite'
+      })
+      navigate('/testing')
+    }
+
+    socket.on('testing_center_invitation', handleTestingCenterInvitation)
+
+    return () => {
+      socket.off('testing_center_invitation', handleTestingCenterInvitation)
+    }
+  }, [user, navigate])
+
   const handleSignupOrLogin = async () => {
     refreshUser()
   }
 
   const handleLogout = async () => {
+    if (user && socket.connected) {
+      socket.emit('unregister_presence')
+    }
+
+    setAutoJoinSession(null)
+    setRoom('')
     await logout()
     navigate('/')
   }
+
+  const clearAutoJoinSession = useCallback(() => {
+    setAutoJoinSession(null)
+  }, [])
+
+  const handleLaunchTestingCenter = useCallback(
+    ({ studentProfileIds = [], room: requestedRoom } = {}) => {
+      if (!user || !studentProfileIds.length) return
+
+      const nextRoom = requestedRoom || generateSessionCode()
+
+      setRoom(nextRoom)
+      setAutoJoinSession({
+        room: nextRoom,
+        sentAt: Date.now(),
+        source: 'teacher-dashboard'
+      })
+
+      if (socket.connected) {
+        socket.emit('request_testing_center_invite', {
+          room: nextRoom,
+          studentProfileIds,
+          teacherId: user.profile || user._id,
+          teacherName: user.name
+        })
+
+        socket.emit(
+          'update_presence',
+          buildPresencePayload(user, '/testing', {
+            currentPath: '/testing',
+            context: 'testing-lobby',
+            room: nextRoom
+          })
+        )
+      }
+
+      navigate('/testing')
+    },
+    [user, navigate]
+  )
 
   return (
     <PerformanceProvider>
@@ -84,6 +231,8 @@ const App = () => {
                 room={room}
                 setRoom={setRoom}
                 socket={socket}
+                autoJoinSession={autoJoinSession}
+                clearAutoJoinSession={clearAutoJoinSession}
               />
             )}
           />
@@ -107,14 +256,17 @@ const App = () => {
             path="/teacher-dashboard"
             element={renderRoleProtectedRoute(
               isTeacher,
-              <TeacherDashboard user={user} />
+              <TeacherDashboard
+                socket={socket}
+                onLaunchTestingCenter={handleLaunchTestingCenter}
+              />
             )}
           />
           <Route
             path="/student-practice"
             element={renderRoleProtectedRoute(
               isStudent,
-              <StudentPracticeMode user={user} />
+              <StudentPracticeMode socket={socket} />
             )}
           />
 

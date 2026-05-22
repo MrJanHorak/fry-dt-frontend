@@ -12,7 +12,6 @@ const Nav = (props) => {
   const isAdmin = Boolean(props.user?.isAdmin)
   const isTeacher = props.user?.role === 'teacher' || isAdmin
   const isStudent = props.user?.role === 'student'
-  const canAccessTesting = isTeacher || isStudent
   const showPerformanceWidget =
     Boolean(props.user) && (import.meta.env.DEV || isAdmin)
 
@@ -44,11 +43,6 @@ const Nav = (props) => {
               <li>
                 <NavLink id="logo" to="/" onClick={() => closeMenu()}>
                   <img src={LogoDesktop} alt="logo" />
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/testing" onClick={() => closeMenu()}>
-                  Testing center
                 </NavLink>
               </li>
               <li>
@@ -91,13 +85,6 @@ const Nav = (props) => {
                   <img src={LogoDesktop} alt="logo" />
                 </NavLink>
               </li>
-              {canAccessTesting && (
-                <li>
-                  <NavLink to="/testing" onClick={() => closeMenu()}>
-                    Testing Center
-                  </NavLink>
-                </li>
-              )}
               <li>
                 {' '}
                 <NavLink to="/study" onClick={() => closeMenu()}>
@@ -166,9 +153,6 @@ const Nav = (props) => {
           <div className="nav-links">
             {isAdmin ? (
               <>
-                <NavLink to="/testing" onClick={() => closeMenu()}>
-                  Testing Center
-                </NavLink>
                 <NavLink to="/study" onClick={() => closeMenu()}>
                   Study Words
                 </NavLink>
@@ -194,11 +178,6 @@ const Nav = (props) => {
               </>
             ) : props.user ? (
               <>
-                {canAccessTesting && (
-                  <NavLink to="/testing" onClick={() => closeMenu()}>
-                    Testing Center
-                  </NavLink>
-                )}
                 <NavLink to="/study" onClick={() => closeMenu()}>
                   Study Words
                 </NavLink>

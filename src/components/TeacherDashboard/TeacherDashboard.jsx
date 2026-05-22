@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
+import useSocket from '../../hooks/useSocket'
 import * as profileService from '../../services/profileService'
 import styles from './styles.module.css'
 
-const TeacherDashboard = () => {
+const TeacherDashboard = ({ socket, onLaunchTestingCenter }) => {
   const { user } = useAuth()
+  const { emit, on, off } = useSocket(socket)
   const [students, setStudents] = useState([])
   const [selectedStudent, setSelectedStudent] = useState(null)
   const [assessments, setAssessments] = useState([])
@@ -34,6 +36,9 @@ const TeacherDashboard = () => {
   })
   const [autoRefresh, setAutoRefresh] = useState(true)
   const [refreshInterval, setRefreshInterval] = useState(null)
+  const [presenceMap, setPresenceMap] = useState({})
+  const [selectedLiveStudents, setSelectedLiveStudents] = useState([])
+  const [liveClassroomNotice, setLiveClassroomNotice] = useState(null)
 
   useEffect(() => {
     if (user?.profile) {
@@ -46,6 +51,67 @@ const TeacherDashboard = () => {
       loadStudentData()
     }
   }, [selectedStudent, dateRange, filters])
+
+  useEffect(() => {
+    if (!user?.profile) return undefined
+
+    const requestPresenceSnapshot = () => {
+      emit('request_presence_snapshot')
+    }
+
+    const handlePresenceSnapshot = (entries = []) => {
+      const nextPresenceMap = entries.reduce((accumulator, entry) => {
+        if (entry?.profileId) {
+          accumulator[entry.profileId] = entry
+        }
+        return accumulator
+      }, {})
+
+      setPresenceMap(nextPresenceMap)
+    }
+
+    const handlePresenceUpdate = (entry) => {
+      if (!entry?.profileId) return
+
+      setPresenceMap((prev) => ({
+        ...prev,
+        [entry.profileId]: entry
+      }))
+    }
+
+    const handlePresenceRemoved = ({ profileId }) => {
+      if (!profileId) return
+
+      setPresenceMap((prev) => {
+        const nextPresence = { ...prev }
+        delete nextPresence[profileId]
+        return nextPresence
+      })
+    }
+
+    on('presence_snapshot', handlePresenceSnapshot)
+    on('presence_updated', handlePresenceUpdate)
+    on('presence_removed', handlePresenceRemoved)
+    on('connect', requestPresenceSnapshot)
+    requestPresenceSnapshot()
+
+    return () => {
+      off('presence_snapshot', handlePresenceSnapshot)
+      off('presence_updated', handlePresenceUpdate)
+      off('presence_removed', handlePresenceRemoved)
+      off('connect', requestPresenceSnapshot)
+    }
+  }, [user?.profile, emit, on, off])
+
+  useEffect(() => {
+    setSelectedLiveStudents((prev) =>
+      prev.filter(
+        (studentId) =>
+          students.some((student) => student._id === studentId) &&
+          Boolean(presenceMap[studentId])
+      )
+    )
+  }, [students, presenceMap])
 
   useEffect(() => {
     if (activeTab === 'monitoring') {
@@ -162,7 +228,7 @@ const TeacherDashboard = () => {
 
     const totalSessions = sessions.length
     const totalConfidence = sessions.reduce(
-      (sum, session) => sum + (session.currentConfidence || 0),
+      (sum, session) => sum + (session.confidence || 0),
       0
     )
     const averageConfidence = Math.round(totalConfidence / totalSessions)
@@ -174,8 +240,8 @@ const TeacherDashboard = () => {
 
     const studentsNeedingHelp = sessions.filter(
       (session) =>
-        session.currentConfidence < 70 ||
-        session.averageResponseTime > 4000 ||
+        session.confidence < 70 ||
+        session.responseTime > 4000 ||
         session.strugglingWords?.length > 0
     )
 
@@ -304,6 +370,93 @@ const TeacherDashboard = () => {
     link.click()
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
+  }
+
+  const toggleLiveStudentSelection = useCallback((studentId) => {
+    setSelectedLiveStudents((prev) =>
+      prev.includes(studentId)
+        ? prev.filter((id) => id !== studentId)
+        : [...prev, studentId]
+    )
+  }, [])
+
+  const handleLaunchSelectedStudents = useCallback(() => {
+    const onlineStudents = selectedLiveStudents.filter((studentId) =>
+      Boolean(presenceMap[studentId])
+    )
+
+    if (!onlineStudents.length) {
+      setLiveClassroomNotice('Select at least one online student to open testing.')
+      return
+    }
+
+    setLiveClassroomNotice(
+      `Opening the testing center for ${onlineStudents.length} student${
+        onlineStudents.length === 1 ? '' : 's'
+      }.`
+    )
+    onLaunchTestingCenter?.({ studentProfileIds: onlineStudents })
+  }, [selectedLiveStudents, presenceMap, onLaunchTestingCenter])
+
+  const formatPresenceContext = useCallback((presenceEntry) => {
+    switch (presenceEntry?.context) {
+      case 'practice-session':
+        return 'Practicing now'
+      case 'practice-lobby':
+        return 'Practice page'
+      case 'testing-center':
+        return 'In testing center'
+      case 'testing-lobby':
+        return 'Opening testing center'
+      case 'testing-invite':
+        return 'Invited to testing'
+      case 'teacher-dashboard':
+        return 'Teacher dashboard'
+      case 'study':
+        return 'Study page'
+      case 'profile':
+        return 'Profile page'
+      case 'chat':
+        return 'Chat room'
+      default:
+        return presenceEntry ? 'Online' : 'Offline'
+    }
+  }, [])
+
+  const rosterStudents = students.map((student) => {
+    const presenceEntry = presenceMap[student._id]
+    const liveSpeechSession = activeSpeechSessions.find(
+      (session) => session.studentId === student._id
+    )
+
+    return {
+      ...student,
+      isOnline: Boolean(presenceEntry),
+      liveContext: formatPresenceContext(presenceEntry),
+      practiceMode: presenceEntry?.practiceMode || null,
+      currentWord: presenceEntry?.currentWord || liveSpeechSession?.currentWord,
+      wordsCompleted:
+        presenceEntry?.wordsCompleted ?? liveSpeechSession?.wordsCompleted ?? 0,
+      totalWords: presenceEntry?.totalWords ?? liveSpeechSession?.totalWords ?? 0,
+      isListening: Boolean(presenceEntry?.isListening),
+      lastActivity: presenceEntry?.lastActivity || liveSpeechSession?.startTime,
+      room: presenceEntry?.room || null
+    }
+  })
+
+  const liveRosterMetrics = {
+    onlineStudents: rosterStudents.filter((student) => student.isOnline).length,
+    practicingStudents: rosterStudents.filter(
+      (student) => student.isOnline && student.practiceMode
+    ).length,
+    testingStudents: rosterStudents.filter(
+      (student) =>
+        student.isOnline &&
+        ['In testing center', 'Opening testing center', 'Invited to testing'].includes(
+          student.liveContext
+        )
+    ).length,
+    selectedStudents: selectedLiveStudents.length
   }
 
   if (loading && !students.length) {
@@ -440,7 +593,7 @@ const TeacherDashboard = () => {
           }`}
           onClick={() => setActiveTab('monitoring')}
         >
-          Speech Monitoring
+          Live Classroom
         </button>
       </div>
 
@@ -706,7 +859,7 @@ const TeacherDashboard = () => {
         {activeTab === 'monitoring' && (
           <div className={styles.monitoring}>
             <div className={styles.monitoringHeader}>
-              <h3>🎤 Live Speech Recognition Monitoring</h3>
+              <h3>Live Classroom Monitoring</h3>
               <div className={styles.monitoringControls}>
                 <label className={styles.autoRefreshToggle}>
                   <input
@@ -728,45 +881,141 @@ const TeacherDashboard = () => {
               </div>
             </div>
 
+            <div className={styles.rosterSection}>
+              <div className={styles.rosterHeader}>
+                <div>
+                  <h4>Class Roster Status</h4>
+                  <p>
+                    Online students can be pulled directly into the testing
+                    center. Session codes remain a fallback.
+                  </p>
+                </div>
+
+                <div className={styles.rosterActions}>
+                  <button
+                    onClick={() =>
+                      setSelectedLiveStudents(
+                        rosterStudents
+                          .filter((student) => student.isOnline)
+                          .map((student) => student._id)
+                      )
+                    }
+                    className={styles.secondaryButton}
+                    type="button"
+                  >
+                    Select Online Students
+                  </button>
+                  <button
+                    onClick={handleLaunchSelectedStudents}
+                    className={styles.primaryButton}
+                    type="button"
+                    disabled={!selectedLiveStudents.length}
+                  >
+                    Open Testing Center
+                  </button>
+                </div>
+              </div>
+
+              {liveClassroomNotice && (
+                <div className={styles.rosterNotice}>{liveClassroomNotice}</div>
+              )}
+
+              <div className={styles.rosterGrid}>
+                {rosterStudents.map((student) => (
+                  <label
+                    key={student._id}
+                    className={`${styles.rosterCard} ${
+                      student.isOnline ? styles.onlineCard : styles.offlineCard
+                    }`}
+                  >
+                    <div className={styles.rosterCardHeader}>
+                      <div>
+                        <h5>{student.name}</h5>
+                        <span
+                          className={`${styles.presenceBadge} ${
+                            student.isOnline ? styles.onlineBadge : styles.offlineBadge
+                          }`}
+                        >
+                          {student.isOnline ? 'Online' : 'Offline'}
+                        </span>
+                      </div>
+
+                      <input
+                        type="checkbox"
+                        checked={selectedLiveStudents.includes(student._id)}
+                        onChange={() => toggleLiveStudentSelection(student._id)}
+                        disabled={!student.isOnline}
+                      />
+                    </div>
+
+                    <div className={styles.rosterDetails}>
+                      <span>Status: {student.liveContext}</span>
+                      {student.practiceMode && (
+                        <span>Mode: {student.practiceMode}</span>
+                      )}
+                      {student.currentWord && (
+                        <span>Current Word: {student.currentWord}</span>
+                      )}
+                      {student.totalWords > 0 && (
+                        <span>
+                          Progress: {student.wordsCompleted}/{student.totalWords}
+                        </span>
+                      )}
+                      {student.isListening && <span>Listening for speech</span>}
+                      {student.lastActivity && (
+                        <span>
+                          Updated: {new Date(student.lastActivity).toLocaleTimeString()}
+                        </span>
+                      )}
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
+
             <div className={styles.metricsOverview}>
               <div className={styles.metricCard}>
-                <h4>Active Sessions</h4>
+                <h4>Students Online</h4>
                 <div className={styles.metricValue}>
-                  {speechMetrics.totalActiveSessions}
+                  {liveRosterMetrics.onlineStudents}
                 </div>
               </div>
               <div className={styles.metricCard}>
-                <h4>Average Confidence</h4>
+                <h4>Practicing Now</h4>
                 <div
                   className={`${styles.metricValue} ${
-                    speechMetrics.averageConfidence >= 80
+                    liveRosterMetrics.practicingStudents > 0
                       ? styles.good
-                      : speechMetrics.averageConfidence >= 60
-                        ? styles.ok
-                        : styles.poor
+                      : styles.ok
                   }`}
                 >
-                  {speechMetrics.averageConfidence}%
+                  {liveRosterMetrics.practicingStudents}
                 </div>
               </div>
               <div className={styles.metricCard}>
-                <h4>Words Practiced</h4>
-                <div className={styles.metricValue}>
-                  {speechMetrics.totalWordsCompleted}
-                </div>
+                <h4>In Testing Center</h4>
+                <div className={styles.metricValue}>{liveRosterMetrics.testingStudents}</div>
               </div>
               <div className={styles.metricCard}>
-                <h4>Need Attention</h4>
+                <h4>Selected For Testing</h4>
                 <div
                   className={`${styles.metricValue} ${
-                    speechMetrics.studentsNeedingHelp.length > 0
+                    liveRosterMetrics.selectedStudents > 0
                       ? styles.alert
                       : styles.good
                   }`}
                 >
-                  {speechMetrics.studentsNeedingHelp.length}
+                  {liveRosterMetrics.selectedStudents}
                 </div>
               </div>
+            </div>
+
+            <div className={styles.telemetryHeader}>
+              <h4>Speech Telemetry</h4>
+              <p>
+                This section uses recent practice/test activity in addition to
+                the live roster above.
+              </p>
             </div>
 
             {speechMetrics.studentsNeedingHelp.length > 0 && (
@@ -775,17 +1024,19 @@ const TeacherDashboard = () => {
                 <div className={styles.alertList}>
                   {speechMetrics.studentsNeedingHelp.map((student, index) => (
                     <div key={index} className={styles.alertItem}>
-                      <span className={styles.studentName}>{student.name}</span>
+                      <span className={styles.studentName}>
+                        {student.studentName || student.name}
+                      </span>
                       <div className={styles.alertReasons}>
-                        {student.currentConfidence < 70 && (
+                        {student.confidence < 70 && (
                           <span className={styles.alertBadge}>
-                            Low Confidence ({student.currentConfidence}%)
+                            Low Confidence ({student.confidence}%)
                           </span>
                         )}
-                        {student.averageResponseTime > 4000 && (
+                        {student.responseTime > 4000 && (
                           <span className={styles.alertBadge}>
                             Slow Response (
-                            {(student.averageResponseTime / 1000).toFixed(1)}s)
+                            {(student.responseTime / 1000).toFixed(1)}s)
                           </span>
                         )}
                         {student.strugglingWords?.length > 0 && (
@@ -847,15 +1098,15 @@ const TeacherDashboard = () => {
                           <label>Response Time:</label>
                           <span
                             className={`${styles.responseTime} ${
-                              session.averageResponseTime <= 2000
+                              session.responseTime <= 2000
                                 ? styles.good
-                                : session.averageResponseTime <= 4000
+                                : session.responseTime <= 4000
                                   ? styles.ok
                                   : styles.poor
                             }`}
                           >
-                            {session.averageResponseTime
-                              ? (session.averageResponseTime / 1000).toFixed(1)
+                            {session.responseTime
+                              ? (session.responseTime / 1000).toFixed(1)
                               : 0}
                             s
                           </span>
@@ -884,12 +1135,12 @@ const TeacherDashboard = () => {
                                     </span>
                                     <span
                                       className={`${styles.attemptResult} ${
-                                        attempt.correct
+                                        attempt.success
                                           ? styles.correct
                                           : styles.incorrect
                                       }`}
                                     >
-                                      {attempt.correct ? '✅' : '❌'}{' '}
+                                      {attempt.success ? '✅' : '❌'}{' '}
                                       {attempt.confidence}%
                                     </span>
                                   </div>
