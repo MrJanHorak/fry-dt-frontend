@@ -254,7 +254,9 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
     fryLevel <= 2 ? [3, 5, 8] : fryLevel <= 5 ? [5, 8, 10] : [5, 10, 15]
   const recommendedWordCount = fryLevel <= 2 ? 5 : fryLevel <= 5 ? 8 : 10
   const showEarlyReaderGuidance =
-    testType === 'recognition' && fryLevel <= 2 && selectedWords.length > recommendedWordCount
+    testType === 'recognition' &&
+    fryLevel <= 2 &&
+    selectedWords.length > recommendedWordCount
 
   const formatResponseTime = (responseTime) => {
     if (typeof responseTime !== 'number' || Number.isNaN(responseTime)) {
@@ -427,7 +429,10 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
           <div className={styles.quickSelect}>
             <h3>Quick Select:</h3>
             {quickSelectCounts.map((count) => (
-              <button key={count} onClick={() => selectWordsByLevel(fryLevel, count)}>
+              <button
+                key={count}
+                onClick={() => selectWordsByLevel(fryLevel, count)}
+              >
                 Random {count} Words
               </button>
             ))}
@@ -463,7 +468,8 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
             </div>
             {showEarlyReaderGuidance && (
               <p className={styles.selectionWarning}>
-                This is a long recognition round for a beginning reader. A shorter set will usually give cleaner speech responses.
+                This is a long recognition round for a beginning reader. A
+                shorter set will usually give cleaner speech responses.
               </p>
             )}
           </div>
@@ -597,7 +603,8 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
               )}
             </p>
             <p className={styles.assessmentHint}>
-              The computer response is already saved. Use this panel to confirm or update it.
+              The computer response is already saved. Use this panel to confirm
+              or update it.
             </p>
 
             <div className={styles.assessmentForm}>

@@ -386,7 +386,9 @@ const TeacherDashboard = ({ socket, onLaunchTestingCenter }) => {
     )
 
     if (!onlineStudents.length) {
-      setLiveClassroomNotice('Select at least one online student to open testing.')
+      setLiveClassroomNotice(
+        'Select at least one online student to open testing.'
+      )
       return
     }
 
@@ -437,7 +439,8 @@ const TeacherDashboard = ({ socket, onLaunchTestingCenter }) => {
       currentWord: presenceEntry?.currentWord || liveSpeechSession?.currentWord,
       wordsCompleted:
         presenceEntry?.wordsCompleted ?? liveSpeechSession?.wordsCompleted ?? 0,
-      totalWords: presenceEntry?.totalWords ?? liveSpeechSession?.totalWords ?? 0,
+      totalWords:
+        presenceEntry?.totalWords ?? liveSpeechSession?.totalWords ?? 0,
       isListening: Boolean(presenceEntry?.isListening),
       lastActivity: presenceEntry?.lastActivity || liveSpeechSession?.startTime,
       room: presenceEntry?.room || null
@@ -452,9 +455,11 @@ const TeacherDashboard = ({ socket, onLaunchTestingCenter }) => {
     testingStudents: rosterStudents.filter(
       (student) =>
         student.isOnline &&
-        ['In testing center', 'Opening testing center', 'Invited to testing'].includes(
-          student.liveContext
-        )
+        [
+          'In testing center',
+          'Opening testing center',
+          'Invited to testing'
+        ].includes(student.liveContext)
     ).length,
     selectedStudents: selectedLiveStudents.length
   }
@@ -933,7 +938,9 @@ const TeacherDashboard = ({ socket, onLaunchTestingCenter }) => {
                         <h5>{student.name}</h5>
                         <span
                           className={`${styles.presenceBadge} ${
-                            student.isOnline ? styles.onlineBadge : styles.offlineBadge
+                            student.isOnline
+                              ? styles.onlineBadge
+                              : styles.offlineBadge
                           }`}
                         >
                           {student.isOnline ? 'Online' : 'Offline'}
@@ -958,13 +965,15 @@ const TeacherDashboard = ({ socket, onLaunchTestingCenter }) => {
                       )}
                       {student.totalWords > 0 && (
                         <span>
-                          Progress: {student.wordsCompleted}/{student.totalWords}
+                          Progress: {student.wordsCompleted}/
+                          {student.totalWords}
                         </span>
                       )}
                       {student.isListening && <span>Listening for speech</span>}
                       {student.lastActivity && (
                         <span>
-                          Updated: {new Date(student.lastActivity).toLocaleTimeString()}
+                          Updated:{' '}
+                          {new Date(student.lastActivity).toLocaleTimeString()}
                         </span>
                       )}
                     </div>
@@ -994,7 +1003,9 @@ const TeacherDashboard = ({ socket, onLaunchTestingCenter }) => {
               </div>
               <div className={styles.metricCard}>
                 <h4>In Testing Center</h4>
-                <div className={styles.metricValue}>{liveRosterMetrics.testingStudents}</div>
+                <div className={styles.metricValue}>
+                  {liveRosterMetrics.testingStudents}
+                </div>
               </div>
               <div className={styles.metricCard}>
                 <h4>Selected For Testing</h4>

@@ -35,7 +35,8 @@ const getPresenceContext = (pathname, role) => {
   if (pathname.startsWith('/teacher-dashboard')) return 'teacher-dashboard'
   if (pathname.startsWith('/student-practice')) return 'practice-lobby'
   if (pathname.startsWith('/testing')) return 'testing-lobby'
-  if (pathname.startsWith('/study')) return role === 'student' ? 'study' : 'online'
+  if (pathname.startsWith('/study'))
+    return role === 'student' ? 'study' : 'online'
   if (pathname.startsWith('/profile')) return 'profile'
   if (pathname.startsWith('/chat')) return 'chat'
   return 'online'
@@ -105,7 +106,10 @@ const App = () => {
     if (!user) return undefined
 
     const registerPresence = () => {
-      socket.emit('register_presence', buildPresencePayload(user, location.pathname))
+      socket.emit(
+        'register_presence',
+        buildPresencePayload(user, location.pathname)
+      )
     }
 
     socket.on('connect', registerPresence)

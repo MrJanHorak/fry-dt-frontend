@@ -193,109 +193,114 @@ const StudentTestingInterface = ({ user, room, socket }) => {
   ])
 
   // Submit response to teacher
-  const submitResponse = useCallback((overrides = {}) => {
-    if (!currentWord || hasSubmittedResponse) return
+  const submitResponse = useCallback(
+    (overrides = {}) => {
+      if (!currentWord || hasSubmittedResponse) return
 
-    const submissionKey = [
-      currentSession?.sessionId || 'session',
-      currentWord.sequence || currentWord.word,
-      user.profile || user._id
-    ].join(':')
+      const submissionKey = [
+        currentSession?.sessionId || 'session',
+        currentWord.sequence || currentWord.word,
+        user.profile || user._id
+      ].join(':')
 
-    if (submittedWordRef.current === submissionKey) {
-      return
-    }
+      if (submittedWordRef.current === submissionKey) {
+        return
+      }
 
-    submittedWordRef.current = submissionKey
+      submittedWordRef.current = submissionKey
 
-    const fallbackResponseTime = responseStartTime
-      ? Date.now() - responseStartTime
-      : 0
-    let responseTime = usesSpeechCapture
-      ? getResponseTime() || fallbackResponseTime
-      : fallbackResponseTime
-    let response = null
-    let recognized = false
-    let responseConfidence = confidence || 0
+      const fallbackResponseTime = responseStartTime
+        ? Date.now() - responseStartTime
+        : 0
+      let responseTime = usesSpeechCapture
+        ? getResponseTime() || fallbackResponseTime
+        : fallbackResponseTime
+      let response = null
+      let recognized = false
+      let responseConfidence = confidence || 0
 
-    switch (testType) {
-      case 'pronunciation':
-        response = finalTranscript
-        recognized = checkWordMatch(currentWord.word, 0.7)
-        break
-      case 'spelling':
-        response = typedResponse
-        recognized =
-          typedResponse.toLowerCase().trim() ===
-          currentWord.word.toLowerCase().trim()
-        break
-      case 'recognition':
-        response = transcriptText
-        recognized = Boolean(transcriptText) && checkWordMatch(currentWord.word, 0.55)
-        break
-      case 'reading':
-        response = transcriptText || 'read_aloud'
-        recognized = Boolean(transcriptText) && checkWordMatch(currentWord.word, 0.55)
-        break
-      default:
-        response = transcriptText || typedResponse
-    }
+      switch (testType) {
+        case 'pronunciation':
+          response = finalTranscript
+          recognized = checkWordMatch(currentWord.word, 0.7)
+          break
+        case 'spelling':
+          response = typedResponse
+          recognized =
+            typedResponse.toLowerCase().trim() ===
+            currentWord.word.toLowerCase().trim()
+          break
+        case 'recognition':
+          response = transcriptText
+          recognized =
+            Boolean(transcriptText) && checkWordMatch(currentWord.word, 0.55)
+          break
+        case 'reading':
+          response = transcriptText || 'read_aloud'
+          recognized =
+            Boolean(transcriptText) && checkWordMatch(currentWord.word, 0.55)
+          break
+        default:
+          response = transcriptText || typedResponse
+      }
 
-    if (Object.prototype.hasOwnProperty.call(overrides, 'response')) {
-      response = overrides.response
-    }
+      if (Object.prototype.hasOwnProperty.call(overrides, 'response')) {
+        response = overrides.response
+      }
 
-    if (Object.prototype.hasOwnProperty.call(overrides, 'recognized')) {
-      recognized = overrides.recognized
-    }
+      if (Object.prototype.hasOwnProperty.call(overrides, 'recognized')) {
+        recognized = overrides.recognized
+      }
 
-    if (Object.prototype.hasOwnProperty.call(overrides, 'responseTime')) {
-      responseTime = overrides.responseTime
-    }
+      if (Object.prototype.hasOwnProperty.call(overrides, 'responseTime')) {
+        responseTime = overrides.responseTime
+      }
 
-    if (Object.prototype.hasOwnProperty.call(overrides, 'confidence')) {
-      responseConfidence = overrides.confidence
-    }
+      if (Object.prototype.hasOwnProperty.call(overrides, 'confidence')) {
+        responseConfidence = overrides.confidence
+      }
 
-    const responseData = {
-      sessionId: currentSession.sessionId,
-      word: currentWord.word,
-      studentId: user.profile || user._id,
-      studentName: user.name,
-      response,
-      responseTime,
+      const responseData = {
+        sessionId: currentSession.sessionId,
+        word: currentWord.word,
+        studentId: user.profile || user._id,
+        studentName: user.name,
+        response,
+        responseTime,
+        testType,
+        recognized,
+        confidence: responseConfidence
+      }
+
+      emit('submit_test_response', responseData)
+      setRecognitionTimedOut(false)
+      setRecognitionCountdown(null)
+      setError(null)
+
+      // Stop listening if in pronunciation mode
+      if (isListening) {
+        stopListening()
+      }
+    },
+    [
+      currentWord,
+      hasSubmittedResponse,
+      responseStartTime,
       testType,
-      recognized,
-      confidence: responseConfidence
-    }
-
-    emit('submit_test_response', responseData)
-    setRecognitionTimedOut(false)
-    setRecognitionCountdown(null)
-    setError(null)
-
-    // Stop listening if in pronunciation mode
-    if (isListening) {
-      stopListening()
-    }
-  }, [
-    currentWord,
-    hasSubmittedResponse,
-    responseStartTime,
-    testType,
-    finalTranscript,
-    transcriptText,
-    typedResponse,
-    usesSpeechCapture,
-    getResponseTime,
-    checkWordMatch,
-    confidence,
-    currentSession,
-    user,
-    emit,
-    isListening,
-    stopListening
-  ])
+      finalTranscript,
+      transcriptText,
+      typedResponse,
+      usesSpeechCapture,
+      getResponseTime,
+      checkWordMatch,
+      confidence,
+      currentSession,
+      user,
+      emit,
+      isListening,
+      stopListening
+    ]
+  )
 
   // Recognition tests run on a countdown and then begin recording automatically.
   useEffect(() => {
@@ -547,17 +552,20 @@ const StudentTestingInterface = ({ user, room, socket }) => {
               {testType === 'recognition' && (
                 <div className={styles.recognitionTest}>
                   <div className={styles.wordDisplay}>
-                    <div className={styles.displayedWord}>{currentWord.word}</div>
+                    <div className={styles.displayedWord}>
+                      {currentWord.word}
+                    </div>
                   </div>
 
                   <div className={styles.speechControls}>
-                    {recognitionCountdown !== null && speechRecognitionSupported && (
-                      <div className={styles.countdownPanel}>
-                        <div className={styles.countdownRing}>
-                          <span>{recognitionCountdown || 'GO'}</span>
+                    {recognitionCountdown !== null &&
+                      speechRecognitionSupported && (
+                        <div className={styles.countdownPanel}>
+                          <div className={styles.countdownRing}>
+                            <span>{recognitionCountdown || 'GO'}</span>
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
                     {isListening && (
                       <div className={styles.listeningIndicator}>

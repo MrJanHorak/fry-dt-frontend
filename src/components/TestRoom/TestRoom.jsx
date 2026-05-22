@@ -75,7 +75,15 @@ const TestRoom = ({
         }, 1000)
       }
     },
-    [room, username, setRoom, socket, user, updateTestingPresence, clearAutoJoinSession]
+    [
+      room,
+      username,
+      setRoom,
+      socket,
+      user,
+      updateTestingPresence,
+      clearAutoJoinSession
+    ]
   )
 
   const joinRoom = () => {
@@ -118,12 +126,18 @@ const TestRoom = ({
                 ? `${autoJoinSession.teacherName} is bringing you in.`
                 : 'Teacher invitation received.'}
             </span>
-            <span className={styles.copyMessage}>Connecting automatically...</span>
+            <span className={styles.copyMessage}>
+              Connecting automatically...
+            </span>
           </div>
         )}
 
         <div className={styles.userInfo}>
-          {isTeacher ? <span>Role: {user.role}</span> : <span>{user.name}</span>}
+          {isTeacher ? (
+            <span>Role: {user.role}</span>
+          ) : (
+            <span>{user.name}</span>
+          )}
           {isTeacher && <span>Name: {user.name}</span>}
         </div>
 
@@ -189,14 +203,24 @@ const TestRoom = ({
             <div className={styles.instructions}>
               <h3>Instructions:</h3>
               <ul>
-                <li>Use the teacher dashboard to see which roster students are online</li>
-                <li>Launch the testing center from the dashboard to pull online students in</li>
-                <li>Open the session to access the teacher testing interface</li>
                 <li>
-                  You can send words, assess responses, and monitor progress live
+                  Use the teacher dashboard to see which roster students are
+                  online
                 </li>
                 <li>
-                  Session codes remain available as a fallback when automatic pull-in is not possible
+                  Launch the testing center from the dashboard to pull online
+                  students in
+                </li>
+                <li>
+                  Open the session to access the teacher testing interface
+                </li>
+                <li>
+                  You can send words, assess responses, and monitor progress
+                  live
+                </li>
+                <li>
+                  Session codes remain available as a fallback when automatic
+                  pull-in is not possible
                 </li>
                 <li>
                   Use the assessment tools to track progress during the session

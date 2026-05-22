@@ -70,7 +70,9 @@ const StudentPracticeMode = ({ socket }) => {
       context: sessionActive ? 'practice-session' : 'practice-lobby',
       practiceMode,
       practiceSessionActive: sessionActive,
-      currentWord: sessionActive ? practiceWords[currentWordIndex] || null : null,
+      currentWord: sessionActive
+        ? practiceWords[currentWordIndex] || null
+        : null,
       wordsCompleted: score.total,
       totalWords: practiceWords.length,
       isListening
