@@ -13,7 +13,8 @@ const TestRoom = ({ user, room, setRoom, socket }) => {
   const username = user.name
   const isTeacher = user.role === 'teacher' || user.isAdmin
 
-  const normalizeRoom = (value) => value.trim().toUpperCase().replace(/\s+/g, '-')
+  const normalizeRoom = (value) =>
+    value.trim().toUpperCase().replace(/\s+/g, '-')
 
   const generateRoomCode = () => {
     const generatedCode = `SESSION-${Math.random()
@@ -85,7 +86,9 @@ const TestRoom = ({ user, room, setRoom, socket }) => {
             }}
             disabled={isConnecting}
             placeholder={
-              isTeacher ? 'Create or paste a session code' : 'Enter session code'
+              isTeacher
+                ? 'Create or paste a session code'
+                : 'Enter session code'
             }
             autoCapitalize="characters"
             autoCorrect="off"
@@ -107,7 +110,9 @@ const TestRoom = ({ user, room, setRoom, socket }) => {
 
         {isTeacher && room && (
           <div className={styles.sessionShareCard}>
-            <span className={styles.helperText}>Share this code with students:</span>
+            <span className={styles.helperText}>
+              Share this code with students:
+            </span>
             <div className={styles.sessionCode}>{room}</div>
             <div className={styles.actionRow}>
               <button
@@ -117,7 +122,9 @@ const TestRoom = ({ user, room, setRoom, socket }) => {
               >
                 Copy Code
               </button>
-              {copyMessage && <span className={styles.copyMessage}>{copyMessage}</span>}
+              {copyMessage && (
+                <span className={styles.copyMessage}>{copyMessage}</span>
+              )}
             </div>
           </div>
         )}
@@ -141,14 +148,16 @@ const TestRoom = ({ user, room, setRoom, socket }) => {
             <ul>
               <li>Create a session code or use one your class already knows</li>
               <li>Share the code with students before starting the test</li>
+              <li>Open the session to access the teacher testing interface</li>
               <li>
-                Open the session to access the teacher testing interface
+                You can send words, assess responses, and monitor progress live
               </li>
-              <li>You can send words, assess responses, and monitor progress live</li>
               <li>
                 Students must join with the same session code to participate
               </li>
-              <li>Use the assessment tools to track progress during the session</li>
+              <li>
+                Use the assessment tools to track progress during the session
+              </li>
             </ul>
           ) : (
             <ul>

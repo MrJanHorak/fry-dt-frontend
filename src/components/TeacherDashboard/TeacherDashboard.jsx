@@ -576,7 +576,9 @@ const TeacherDashboard = () => {
                     <div className={styles.sessionHeader}>
                       <h4>{session.sessionType} Session</h4>
                       {session.testType && (
-                        <span className={styles.testType}>{session.testType}</span>
+                        <span className={styles.testType}>
+                          {session.testType}
+                        </span>
                       )}
                       <span className={styles.date}>
                         {new Date(session.startTime).toLocaleDateString()}
@@ -740,8 +742,8 @@ const TeacherDashboard = () => {
                     speechMetrics.averageConfidence >= 80
                       ? styles.good
                       : speechMetrics.averageConfidence >= 60
-                      ? styles.ok
-                      : styles.poor
+                        ? styles.ok
+                        : styles.poor
                   }`}
                 >
                   {speechMetrics.averageConfidence}%
@@ -833,8 +835,8 @@ const TeacherDashboard = () => {
                               session.confidence >= 80
                                 ? styles.good
                                 : session.confidence >= 60
-                                ? styles.ok
-                                : styles.poor
+                                  ? styles.ok
+                                  : styles.poor
                             }`}
                           >
                             {session.confidence?.toFixed(1) || 0}%
@@ -848,8 +850,8 @@ const TeacherDashboard = () => {
                               session.averageResponseTime <= 2000
                                 ? styles.good
                                 : session.averageResponseTime <= 4000
-                                ? styles.ok
-                                : styles.poor
+                                  ? styles.ok
+                                  : styles.poor
                             }`}
                           >
                             {session.averageResponseTime
