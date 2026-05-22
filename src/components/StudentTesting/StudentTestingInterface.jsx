@@ -176,7 +176,7 @@ const StudentTestingInterface = ({ user, room, socket }) => {
     const responseData = {
       sessionId: currentSession.sessionId,
       word: currentWord.word,
-      studentId: user._id,
+      studentId: user.profile || user._id,
       studentName: user.name,
       response,
       responseTime,
@@ -227,7 +227,7 @@ const StudentTestingInterface = ({ user, room, socket }) => {
     if (currentWord) {
       emit('request_word_pronunciation', {
         word: currentWord.word,
-        studentId: user._id,
+        studentId: user.profile || user._id,
         sessionId: currentSession?.sessionId
       })
     }

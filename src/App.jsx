@@ -1,13 +1,11 @@
 import { useState } from 'react'
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom'
 import io from 'socket.io-client'
 import './App.css'
 
 // Context Providers
+import { useAuth } from './contexts/AuthContext'
 import { PerformanceProvider } from './contexts/PerformanceContext'
-
-// Services
-import { getUser, logout } from './services/authService'
 
 // Pages + Components
 import Nav from './components/Nav/Nav'
@@ -32,18 +30,27 @@ const socket = io.connect('http://localhost:3000')
  */
 const App = () => {
   const navigate = useNavigate()
-  const [user, setUser] = useState(getUser())
+  const { user, refreshUser, logout } = useAuth()
   const [username, setUsername] = useState('')
   const [room, setRoom] = useState('')
 
+  const isAdmin = Boolean(user?.isAdmin)
+  const isTeacher = isAdmin || user?.role === 'teacher'
+  const isStudent = user?.role === 'student'
+  const canAccessTesting = isTeacher || isStudent
+
+  const renderProtectedRoute = (element) =>
+    user ? element : <Navigate to="/signin" replace />
+
+  const renderRoleProtectedRoute = (allowed, element) =>
+    allowed ? element : <Navigate to={user ? '/' : '/signin'} replace />
+
   const handleSignupOrLogin = async () => {
-    const currentUser = await getUser()
-    setUser(currentUser)
+    refreshUser()
   }
 
-  const handleLogout = () => {
-    logout()
-    setUser(null)
+  const handleLogout = async () => {
+    await logout()
     navigate('/')
   }
 
@@ -51,7 +58,7 @@ const App = () => {
     <PerformanceProvider>
       <div className="App">
         <Nav user={user} handleLogout={handleLogout} />
-        {user && <MonitoringDashboard />}
+        {user && (import.meta.env.DEV || isAdmin) && <MonitoringDashboard />}
         <Routes>
           <Route path="/" element={<Landing user={user} />} />
           <Route
@@ -62,10 +69,14 @@ const App = () => {
             path="/signup"
             element={<SignUp handleSignupOrLogin={handleSignupOrLogin} />}
           />
-          <Route path="/study" element={<Study user={user} />} />
+          <Route
+            path="/study"
+            element={renderProtectedRoute(<Study user={user} />)}
+          />
           <Route
             path="/testing"
-            element={
+            element={renderRoleProtectedRoute(
+              canAccessTesting,
               <Testing
                 user={user}
                 username={username}
@@ -74,27 +85,37 @@ const App = () => {
                 setRoom={setRoom}
                 socket={socket}
               />
-            }
+            )}
           />
           <Route
             path="/chat"
-            element={
+            element={renderRoleProtectedRoute(
+              canAccessTesting,
               <Chat
                 user={user}
                 username={username}
                 room={room}
                 socket={socket}
               />
-            }
+            )}
           />
-          <Route path="/profile" element={<Profile user={user} />} />
+          <Route
+            path="/profile"
+            element={renderProtectedRoute(<Profile user={user} />)}
+          />
           <Route
             path="/teacher-dashboard"
-            element={<TeacherDashboard user={user} />}
+            element={renderRoleProtectedRoute(
+              isTeacher,
+              <TeacherDashboard user={user} />
+            )}
           />
           <Route
             path="/student-practice"
-            element={<StudentPracticeMode user={user} />}
+            element={renderRoleProtectedRoute(
+              isStudent,
+              <StudentPracticeMode user={user} />
+            )}
           />
 
           {/* <Route path='/admin' element={<Admin user={user} />} /> */}

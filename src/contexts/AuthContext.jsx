@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import * as authService from '../services/authService'
 
 const AuthContext = createContext()
@@ -12,31 +12,31 @@ export const useAuth = () => {
 }
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState(() => authService.getUser())
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        // Check if user is logged in
-        const currentUser = authService.getUser()
-        setUser(currentUser)
-      } catch (error) {
-        console.error('Auth check failed:', error)
-        setUser(null)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    checkAuth()
+  const refreshUser = useCallback(() => {
+    const currentUser = authService.getUser()
+    setUser(currentUser)
+    return currentUser
   }, [])
+
+  useEffect(() => {
+    try {
+      refreshUser()
+    } catch (error) {
+      console.error('Auth check failed:', error)
+      setUser(null)
+    } finally {
+      setLoading(false)
+    }
+  }, [refreshUser])
 
   const login = async (credentials) => {
     try {
-      const userData = await authService.login(credentials)
-      setUser(userData.user)
-      return userData
+      const authData = await authService.login(credentials)
+      const currentUser = refreshUser()
+      return { ...authData, user: currentUser }
     } catch (error) {
       console.error('Login failed:', error)
       throw error
@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await authService.logout()
+      authService.logout()
       setUser(null)
     } catch (error) {
       console.error('Logout failed:', error)
@@ -56,7 +56,8 @@ export const AuthProvider = ({ children }) => {
     user,
     login,
     logout,
-    loading
+    loading,
+    refreshUser
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

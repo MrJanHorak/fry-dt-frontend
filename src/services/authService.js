@@ -1,6 +1,14 @@
 import * as tokenService from './tokenService'
 const BASE_URL = 'http://localhost:3000/api/auth'
 
+const getErrorMessage = (payload, fallback) => {
+  if (payload?.details?.length) {
+    return payload.details.join(', ')
+  }
+
+  return payload?.err || fallback
+}
+
 async function signup(user) {
   try {
     const res = await fetch(`${BASE_URL}/signup`, {
@@ -9,11 +17,16 @@ async function signup(user) {
       body: JSON.stringify(user)
     })
     const json = await res.json()
+    if (!res.ok || json.err) {
+      throw new Error(getErrorMessage(json, 'Unable to create account'))
+    }
     if (json.token) {
       tokenService.setToken(json.token)
     }
-    if (json.err) {
-      throw new Error(json.err)
+
+    return {
+      ...json,
+      user: tokenService.getUserFromToken()
     }
   } catch (err) {
     console.log(err)
@@ -32,8 +45,8 @@ async function addStudent(user) {
       body: JSON.stringify(user)
     })
     const json = await res.json()
-    if (json.err) {
-      throw new Error(json.err)
+    if (!res.ok || json.err) {
+      throw new Error(getErrorMessage(json, 'Unable to add student'))
     }
     return json
   } catch (err) {
@@ -58,11 +71,16 @@ async function login(credentials) {
       body: JSON.stringify(credentials)
     })
     const json = await res.json()
+    if (!res.ok || json.err) {
+      throw new Error(getErrorMessage(json, 'Unable to sign in'))
+    }
     if (json.token) {
       tokenService.setToken(json.token)
     }
-    if (json.err) {
-      throw new Error(json.err)
+
+    return {
+      ...json,
+      user: tokenService.getUserFromToken()
     }
   } catch (err) {
     throw err
@@ -86,8 +104,8 @@ async function changePassword(id, pw) {
     })
     const json = await res.json()
 
-    if (json.err) {
-      throw new Error(json.err)
+    if (!res.ok || json.err) {
+      throw new Error(getErrorMessage(json, 'Unable to change password'))
     }
   } catch (err) {
     throw err

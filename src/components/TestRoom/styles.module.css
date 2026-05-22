@@ -76,6 +76,78 @@
   padding: 10px;
 }
 
+.roomField {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.secondaryAction {
+  width: 100%;
+  border: 1px solid rgb(63, 73, 204);
+  background: white;
+  color: rgb(63, 73, 204);
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background 0.2s, color 0.2s;
+}
+
+.secondaryAction:hover {
+  background: rgb(63, 73, 204);
+  color: white;
+}
+
+.secondaryAction:disabled {
+  border-color: #cccccc;
+  color: #999999;
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.sessionShareCard {
+  width: 100%;
+  padding: 20px;
+  border-radius: 10px;
+  background: #f3f6ff;
+  border: 1px solid #c8d2ff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.helperText {
+  color: #3f49cc;
+  font-weight: 600;
+}
+
+.sessionCode {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #1d275f;
+  text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+  background: white;
+  border: 1px dashed #7d88ea;
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.copyMessage {
+  color: #2f6f3e;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .instructions {
   width: 100%;
   background: #e3f2fd;
@@ -148,5 +220,10 @@
 
   .instructions {
     padding: 15px;
+  }
+
+  .actionRow {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

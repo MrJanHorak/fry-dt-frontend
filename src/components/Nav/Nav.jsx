@@ -9,6 +9,12 @@ import PerformanceWidget from '../PerformanceWidget/PerformanceWidget'
 
 const Nav = (props) => {
   const [navbarOpen, setNavbarOpen] = useState(false)
+  const isAdmin = Boolean(props.user?.isAdmin)
+  const isTeacher = props.user?.role === 'teacher' || isAdmin
+  const isStudent = props.user?.role === 'student'
+  const canAccessTesting = isTeacher || isStudent
+  const showPerformanceWidget =
+    Boolean(props.user) && (import.meta.env.DEV || isAdmin)
 
   const handleToggle = () => {
     setNavbarOpen((prev) => !prev)
@@ -33,7 +39,7 @@ const Nav = (props) => {
               />
             )}
           </button>
-          {props.user && props.user.isAdmin ? (
+          {isAdmin ? (
             <ul className={`menuNav ${navbarOpen ? ' showMenu' : ''}`}>
               <li>
                 <NavLink id="logo" to="/" onClick={() => closeMenu()}>
@@ -85,22 +91,33 @@ const Nav = (props) => {
                   <img src={LogoDesktop} alt="logo" />
                 </NavLink>
               </li>
-              <li>
-                <NavLink to="/testing" onClick={() => closeMenu()}>
-                  Testing Center
-                </NavLink>
-              </li>
+              {canAccessTesting && (
+                <li>
+                  <NavLink to="/testing" onClick={() => closeMenu()}>
+                    Testing Center
+                  </NavLink>
+                </li>
+              )}
               <li>
                 {' '}
                 <NavLink to="/study" onClick={() => closeMenu()}>
                   Study Words
                 </NavLink>
               </li>
-              <li>
-                <NavLink to="/student-practice" onClick={() => closeMenu()}>
-                  Practice Mode
-                </NavLink>
-              </li>
+              {isTeacher && (
+                <li>
+                  <NavLink to="/teacher-dashboard" onClick={() => closeMenu()}>
+                    Teacher Dashboard
+                  </NavLink>
+                </li>
+              )}
+              {isStudent && (
+                <li>
+                  <NavLink to="/student-practice" onClick={() => closeMenu()}>
+                    Practice Mode
+                  </NavLink>
+                </li>
+              )}
               <li>
                 <NavLink to="/profile" onClick={() => closeMenu()}>
                   Profile
@@ -127,25 +144,13 @@ const Nav = (props) => {
               </li>
               <li>
                 {' '}
-                <NavLink
-                  to="/signup"
-                  onClick={() => {
-                    props.handleLogout()
-                    closeMenu()
-                  }}
-                >
+                <NavLink to="/signup" onClick={() => closeMenu()}>
                   Sign Up
                 </NavLink>{' '}
               </li>
               <li>
                 {' '}
-                <NavLink
-                  to="/signin"
-                  onClick={() => {
-                    props.handleLogout()
-                    closeMenu()
-                  }}
-                >
+                <NavLink to="/signin" onClick={() => closeMenu()}>
                   Sign In
                 </NavLink>{' '}
               </li>
@@ -159,7 +164,7 @@ const Nav = (props) => {
             <img src={LogoDesktop} alt="logo" />
           </NavLink>
           <div className="nav-links">
-            {props.user && props.user.isAdmin ? (
+            {isAdmin ? (
               <>
                 <NavLink to="/testing" onClick={() => closeMenu()}>
                   Testing Center
@@ -189,16 +194,24 @@ const Nav = (props) => {
               </>
             ) : props.user ? (
               <>
-                {' '}
-                <NavLink to="/testing" onClick={() => closeMenu()}>
-                  Testing Center
-                </NavLink>
+                {canAccessTesting && (
+                  <NavLink to="/testing" onClick={() => closeMenu()}>
+                    Testing Center
+                  </NavLink>
+                )}
                 <NavLink to="/study" onClick={() => closeMenu()}>
                   Study Words
                 </NavLink>
-                <NavLink to="/student-practice" onClick={() => closeMenu()}>
-                  Practice Mode
-                </NavLink>
+                {isTeacher && (
+                  <NavLink to="/teacher-dashboard" onClick={() => closeMenu()}>
+                    Teacher Dashboard
+                  </NavLink>
+                )}
+                {isStudent && (
+                  <NavLink to="/student-practice" onClick={() => closeMenu()}>
+                    Practice Mode
+                  </NavLink>
+                )}
                 <NavLink to="/profile" onClick={() => closeMenu()}>
                   Profile
                 </NavLink>
@@ -214,31 +227,17 @@ const Nav = (props) => {
               </>
             ) : (
               <>
-                <NavLink
-                  to="/signup"
-                  onClick={() => {
-                    props.handleLogout()
-                    closeMenu()
-                  }}
-                >
+                <NavLink to="/signup" onClick={() => closeMenu()}>
                   Sign Up
                 </NavLink>
-                <NavLink
-                  to="/signin"
-                  onClick={() => {
-                    props.handleLogout()
-                    closeMenu()
-                  }}
-                >
+                <NavLink to="/signin" onClick={() => closeMenu()}>
                   Sign In
                 </NavLink>
               </>
             )}
           </div>
           {/* Performance Widget - only show for authenticated users in development */}
-          {(process.env.NODE_ENV === 'development' || props.user?.isAdmin) && (
-            <PerformanceWidget />
-          )}
+          {showPerformanceWidget && <PerformanceWidget />}
         </nav>
       </div>
     </>

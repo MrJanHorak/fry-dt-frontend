@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import styles from './styles.module.css'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import TeacherTestingInterface from '../TeacherTesting/TeacherTestingInterface'
 import StudentTestingInterface from '../StudentTesting/StudentTestingInterface'
 
@@ -8,15 +8,42 @@ const TestRoom = ({ user, room, setRoom, socket }) => {
   const navigate = useNavigate()
   const [hasJoinedRoom, setHasJoinedRoom] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
+  const [copyMessage, setCopyMessage] = useState('')
 
-  let username = user.name
+  const username = user.name
+  const isTeacher = user.role === 'teacher' || user.isAdmin
+
+  const normalizeRoom = (value) => value.trim().toUpperCase().replace(/\s+/g, '-')
+
+  const generateRoomCode = () => {
+    const generatedCode = `SESSION-${Math.random()
+      .toString(36)
+      .slice(2, 8)
+      .toUpperCase()}`
+
+    setRoom(generatedCode)
+    setCopyMessage('')
+  }
+
+  const copyRoomCode = async () => {
+    if (!room) return
+
+    try {
+      await navigator.clipboard.writeText(room)
+      setCopyMessage('Session code copied')
+    } catch (error) {
+      setCopyMessage('Unable to copy automatically')
+    }
+  }
 
   const joinRoom = () => {
-    if (room !== '' && username !== '') {
-      setIsConnecting(true)
-      socket.emit('join_room', { username, user, room })
+    const nextRoom = normalizeRoom(room)
 
-      // Wait a moment for the socket connection to establish
+    if (nextRoom !== '' && username !== '') {
+      setIsConnecting(true)
+      setRoom(nextRoom)
+      socket.emit('join_room', { username, user, room: nextRoom })
+
       setTimeout(() => {
         setHasJoinedRoom(true)
         setIsConnecting(false)
@@ -24,16 +51,8 @@ const TestRoom = ({ user, room, setRoom, socket }) => {
     }
   }
 
-  // Auto-redirect if no room is selected
-  useEffect(() => {
-    if (!room && !hasJoinedRoom) {
-      // Don't auto-redirect, let user select room
-    }
-  }, [room, hasJoinedRoom])
-
-  // If user has joined a room, show the appropriate testing interface
   if (hasJoinedRoom) {
-    if (user.role === 'teacher') {
+    if (isTeacher) {
       return <TeacherTestingInterface user={user} room={room} socket={socket} />
     } else {
       return <StudentTestingInterface user={user} room={room} socket={socket} />
@@ -45,9 +64,9 @@ const TestRoom = ({ user, room, setRoom, socket }) => {
       <div className={styles.formContainer}>
         <h1>Testing Center</h1>
         <p className={styles.subtitle}>
-          {user.role === 'teacher'
-            ? 'Select a room to start or manage testing sessions'
-            : 'Select a room to join a testing session'}
+          {isTeacher
+            ? 'Create or share a session code to invite students into a live test'
+            : 'Enter the session code your teacher shared with you'}
         </p>
 
         <div className={styles.userInfo}>
@@ -55,48 +74,85 @@ const TestRoom = ({ user, room, setRoom, socket }) => {
           <span>Name: {user.name}</span>
         </div>
 
-        <select
-          className={styles.input}
-          value={room}
-          onChange={(e) => setRoom(e.target.value)}
-          disabled={isConnecting}
-        >
-          <option value="">-- Select Room --</option>
-          <option value="room-1">Testing Room 1</option>
-          <option value="room-2">Testing Room 2</option>
-          <option value="room-3">Testing Room 3</option>
-          <option value="practice">Practice Room</option>
-          <option value="assessment">Assessment Room</option>
-        </select>
+        <div className={styles.roomField}>
+          <input
+            className={styles.input}
+            type="text"
+            value={room}
+            onChange={(e) => {
+              setRoom(e.target.value.toUpperCase())
+              setCopyMessage('')
+            }}
+            disabled={isConnecting}
+            placeholder={
+              isTeacher ? 'Create or paste a session code' : 'Enter session code'
+            }
+            autoCapitalize="characters"
+            autoCorrect="off"
+            autoComplete="off"
+            spellCheck={false}
+          />
+
+          {isTeacher && (
+            <button
+              type="button"
+              className={styles.secondaryAction}
+              onClick={generateRoomCode}
+              disabled={isConnecting}
+            >
+              Generate Session Code
+            </button>
+          )}
+        </div>
+
+        {isTeacher && room && (
+          <div className={styles.sessionShareCard}>
+            <span className={styles.helperText}>Share this code with students:</span>
+            <div className={styles.sessionCode}>{room}</div>
+            <div className={styles.actionRow}>
+              <button
+                type="button"
+                className={styles.secondaryAction}
+                onClick={copyRoomCode}
+              >
+                Copy Code
+              </button>
+              {copyMessage && <span className={styles.copyMessage}>{copyMessage}</span>}
+            </div>
+          </div>
+        )}
 
         <button
           className="btn btn-secondary"
           style={{ width: '100%' }}
           onClick={joinRoom}
-          disabled={!room || isConnecting}
+          disabled={!normalizeRoom(room) || isConnecting}
         >
-          {isConnecting ? 'Connecting...' : 'Join Room'}
+          {isConnecting
+            ? 'Connecting...'
+            : isTeacher
+              ? 'Open Session'
+              : 'Join Session'}
         </button>
 
         <div className={styles.instructions}>
           <h3>Instructions:</h3>
-          {user.role === 'teacher' ? (
+          {isTeacher ? (
             <ul>
+              <li>Create a session code or use one your class already knows</li>
+              <li>Share the code with students before starting the test</li>
               <li>
-                Select a room and join to access the teacher testing interface
+                Open the session to access the teacher testing interface
               </li>
+              <li>You can send words, assess responses, and monitor progress live</li>
               <li>
-                You can start test sessions, send words to students, and assess
-                responses
+                Students must join with the same session code to participate
               </li>
-              <li>
-                Students must be in the same room to participate in your tests
-              </li>
-              <li>Use the assessment tools to track student progress</li>
+              <li>Use the assessment tools to track progress during the session</li>
             </ul>
           ) : (
             <ul>
-              <li>Select the same room as your teacher</li>
+              <li>Enter the exact session code your teacher shared</li>
               <li>Wait for your teacher to start a test session</li>
               <li>Follow the on-screen instructions for each test</li>
               <li>

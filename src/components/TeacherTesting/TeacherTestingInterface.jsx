@@ -67,12 +67,14 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
 
       // Fetch profiles for connected students
       students.forEach(async (student) => {
-        if (student.user?._id && !studentProfiles[student.user._id]) {
+        const studentProfileId = student.user?.profile || student.user?._id
+
+        if (studentProfileId && !studentProfiles[studentProfileId]) {
           try {
-            const profile = await getProfileById(student.user._id)
+            const profile = await getProfileById(studentProfileId)
             setStudentProfiles((prev) => ({
               ...prev,
-              [student.user._id]: profile
+              [studentProfileId]: profile
             }))
           } catch (error) {
             console.log('Error fetching student profile:', error)
@@ -113,7 +115,7 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
 
     const sessionData = {
       sessionId,
-      teacherId: user._id,
+      teacherId: user.profile || user._id,
       room,
       testType,
       wordsToTest: selectedWords,
@@ -172,6 +174,11 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
       sessionId: currentSession.sessionId,
       word: response.word,
       studentId: response.studentId,
+      testType,
+      studentName: response.studentName,
+      response: response.response,
+      responseTime: response.responseTime,
+      confidence: response.confidence,
       teacherNotes: notes,
       score,
       recognized
@@ -289,7 +296,7 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
           <h2>Connected Students ({connectedStudents.length})</h2>
           <div className={styles.studentsList}>
             {connectedStudents.map((student) => {
-              const studentId = student.user?._id
+              const studentId = student.user?.profile || student.user?._id
               const studentName = student.user?.name || 'Unknown Student'
               const strugglingWords = getStudentStrugglingWords(studentId)
               const profile = studentProfiles[studentId]
@@ -525,7 +532,7 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
               <label>
                 Recognized Correctly:
                 <select
-                  value={wordScore || ''}
+                  value={wordScore === null ? '' : String(wordScore)}
                   onChange={(e) => setWordScore(e.target.value === 'true')}
                 >
                   <option value="">Select...</option>

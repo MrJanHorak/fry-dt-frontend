@@ -110,6 +110,7 @@ const TeacherDashboard = () => {
       const sessionParams = new URLSearchParams({
         startDate: dateRange.startDate,
         endDate: dateRange.endDate,
+        ...(filters.testType !== 'all' && { testType: filters.testType }),
         ...(filters.sessionType !== 'all' && {
           sessionType: filters.sessionType
         })
@@ -574,6 +575,9 @@ const TeacherDashboard = () => {
                   <div key={index} className={styles.sessionItem}>
                     <div className={styles.sessionHeader}>
                       <h4>{session.sessionType} Session</h4>
+                      {session.testType && (
+                        <span className={styles.testType}>{session.testType}</span>
+                      )}
                       <span className={styles.date}>
                         {new Date(session.startTime).toLocaleDateString()}
                       </span>
@@ -583,19 +587,24 @@ const TeacherDashboard = () => {
                         <span>Words: {session.wordsUsed?.length || 0}</span>
                         <span>
                           Duration:{' '}
-                          {Math.round(
-                            (new Date(session.endTime) -
-                              new Date(session.startTime)) /
-                              60000
-                          )}
-                          min
+                          {session.endTime
+                            ? `${Math.max(
+                                0,
+                                Math.round(
+                                  (new Date(session.endTime) -
+                                    new Date(session.startTime)) /
+                                    60000
+                                )
+                              )} min`
+                            : 'In progress'}
                         </span>
+                        <span>Status: {session.status || 'completed'}</span>
                         {session.results && (
                           <span>
                             Accuracy:{' '}
                             {(
-                              (session.results.correctWords /
-                                session.results.totalWords) *
+                              ((session.results.correctWords || 0) /
+                                Math.max(session.results.totalWords || 0, 1)) *
                               100
                             ).toFixed(1)}
                             %
