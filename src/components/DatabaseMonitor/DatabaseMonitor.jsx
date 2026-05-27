@@ -3,12 +3,10 @@
  * Provides real-time database performance monitoring and optimization insights
  */
 
-import React, { useState, useEffect, useContext } from 'react'
-import { PerformanceContext } from '../../contexts/PerformanceContext'
+import React, { useState, useEffect } from 'react'
 import './DatabaseMonitor.css'
 
 const DatabaseMonitor = () => {
-  const { performanceData } = useContext(PerformanceContext)
   const [databaseData, setDatabaseData] = useState({
     health: null,
     indexes: [],
@@ -169,7 +167,7 @@ const DatabaseMonitor = () => {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const data = await response.json()
+      await response.json()
       alert('Database optimization completed successfully!')
       // Refresh all data
       await Promise.all([
@@ -201,7 +199,7 @@ const DatabaseMonitor = () => {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const data = await response.json()
+      await response.json()
       alert('Database indexes created successfully!')
       await fetchDatabaseIndexes()
     } catch (error) {

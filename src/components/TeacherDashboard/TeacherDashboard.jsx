@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import useSocket from '../../hooks/useSocket'
 import * as profileService from '../../services/profileService'
@@ -11,7 +11,6 @@ const TeacherDashboard = ({ socket, onLaunchTestingCenter }) => {
   const [selectedStudent, setSelectedStudent] = useState(null)
   const [assessments, setAssessments] = useState([])
   const [testSessions, setTestSessions] = useState([])
-  const [progressData, setProgressData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('overview')
   const [dateRange, setDateRange] = useState({
@@ -35,22 +34,127 @@ const TeacherDashboard = ({ socket, onLaunchTestingCenter }) => {
     totalWordsCompleted: 0
   })
   const [autoRefresh, setAutoRefresh] = useState(true)
-  const [refreshInterval, setRefreshInterval] = useState(null)
   const [presenceMap, setPresenceMap] = useState({})
   const [selectedLiveStudents, setSelectedLiveStudents] = useState([])
   const [liveClassroomNotice, setLiveClassroomNotice] = useState(null)
+  const refreshIntervalRef = useRef(null)
+
+  const calculateSpeechMetrics = useCallback((sessions) => {
+    if (!sessions.length) {
+      return {
+        totalActiveSessions: 0,
+        averageConfidence: 0,
+        studentsNeedingHelp: [],
+        totalWordsCompleted: 0
+      }
+    }
+
+    const totalSessions = sessions.length
+    const totalConfidence = sessions.reduce(
+      (sum, session) => sum + (session.confidence || 0),
+      0
+    )
+    const averageConfidence = Math.round(totalConfidence / totalSessions)
+
+    const totalWords = sessions.reduce(
+      (sum, session) => sum + (session.wordsCompleted || 0),
+      0
+    )
+
+    const studentsNeedingHelp = sessions.filter(
+      (session) =>
+        session.confidence < 70 ||
+        session.responseTime > 4000 ||
+        session.strugglingWords?.length > 0
+    )
+
+    return {
+      totalActiveSessions: totalSessions,
+      averageConfidence,
+      studentsNeedingHelp,
+      totalWordsCompleted: totalWords
+    }
+  }, [])
+
+  const loadStudents = useCallback(async () => {
+    if (!user?.profile) return
+
+    try {
+      setLoading(true)
+      const profileData = await profileService.getProfile(user.profile)
+      setStudents(profileData.students || [])
+      if (profileData.students?.length > 0) {
+        setSelectedStudent(profileData.students[0])
+      }
+    } catch (error) {
+      console.error('Error loading students:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [user?.profile])
+
+  const loadStudentData = useCallback(async () => {
+    if (!selectedStudent) return
+
+    try {
+      setLoading(true)
+
+      const assessmentParams = new URLSearchParams({
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate,
+        ...(filters.testType !== 'all' && { testType: filters.testType }),
+        ...(filters.wordLevel !== 'all' && { wordLevel: filters.wordLevel })
+      })
+
+      const assessmentData = await profileService.getAssessments(
+        selectedStudent._id,
+        assessmentParams.toString()
+      )
+      setAssessments(assessmentData)
+
+      const sessionParams = new URLSearchParams({
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate,
+        ...(filters.testType !== 'all' && { testType: filters.testType }),
+        ...(filters.sessionType !== 'all' && {
+          sessionType: filters.sessionType
+        })
+      })
+
+      const sessionData = await profileService.getTestSessions(
+        selectedStudent._id,
+        sessionParams.toString()
+      )
+      setTestSessions(sessionData)
+    } catch (error) {
+      console.error('Error loading student data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [dateRange, filters, selectedStudent])
+
+  const loadActiveSpeechSessions = useCallback(async () => {
+    if (!user?.profile) return
+
+    try {
+      const activeSessionsData = await profileService.getActiveSpeechSessions(
+        user.profile
+      )
+      const sessions = activeSessionsData.sessions || []
+      setActiveSpeechSessions(sessions)
+      setSpeechMetrics(calculateSpeechMetrics(sessions))
+    } catch (error) {
+      console.error('Error loading active speech sessions:', error)
+    }
+  }, [calculateSpeechMetrics, user?.profile])
 
   useEffect(() => {
-    if (user?.profile) {
-      loadStudents()
-    }
-  }, [user])
+    loadStudents()
+  }, [loadStudents])
 
   useEffect(() => {
-    if (selectedStudent) {
-      loadStudentData()
-    }
-  }, [selectedStudent, dateRange, filters])
+    loadStudentData()
+  }, [loadStudentData])
 
   useEffect(() => {
     if (!user?.profile) return undefined
@@ -117,141 +221,26 @@ const TeacherDashboard = ({ socket, onLaunchTestingCenter }) => {
     if (activeTab === 'monitoring') {
       loadActiveSpeechSessions()
     }
-  }, [activeTab, selectedStudent])
+  }, [activeTab, loadActiveSpeechSessions])
 
   useEffect(() => {
+    if (refreshIntervalRef.current) {
+      clearInterval(refreshIntervalRef.current)
+      refreshIntervalRef.current = null
+    }
     if (autoRefresh && activeTab === 'monitoring') {
-      const interval = setInterval(() => {
+      refreshIntervalRef.current = setInterval(() => {
         loadActiveSpeechSessions()
-      }, 5000) // Refresh every 5 seconds
-      setRefreshInterval(interval)
+      }, 5000)
+    }
 
-      return () => {
-        if (interval) clearInterval(interval)
-      }
-    } else {
-      if (refreshInterval) {
-        clearInterval(refreshInterval)
-        setRefreshInterval(null)
+    return () => {
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current)
+        refreshIntervalRef.current = null
       }
     }
-  }, [autoRefresh, activeTab])
-
-  const loadStudents = async () => {
-    try {
-      setLoading(true)
-      const profileData = await profileService.getProfile(user.profile)
-      setStudents(profileData.students || [])
-      if (profileData.students?.length > 0) {
-        setSelectedStudent(profileData.students[0])
-      }
-    } catch (error) {
-      console.error('Error loading students:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const loadStudentData = async () => {
-    if (!selectedStudent) return
-
-    try {
-      setLoading(true)
-
-      // Load assessments with filters
-      const assessmentParams = new URLSearchParams({
-        startDate: dateRange.startDate,
-        endDate: dateRange.endDate,
-        ...(filters.testType !== 'all' && { testType: filters.testType }),
-        ...(filters.wordLevel !== 'all' && { wordLevel: filters.wordLevel })
-      })
-
-      const assessmentData = await profileService.getAssessments(
-        selectedStudent._id,
-        assessmentParams.toString()
-      )
-      setAssessments(assessmentData)
-
-      // Load test sessions with filters
-      const sessionParams = new URLSearchParams({
-        startDate: dateRange.startDate,
-        endDate: dateRange.endDate,
-        ...(filters.testType !== 'all' && { testType: filters.testType }),
-        ...(filters.sessionType !== 'all' && {
-          sessionType: filters.sessionType
-        })
-      })
-
-      const sessionData = await profileService.getTestSessions(
-        selectedStudent._id,
-        sessionParams.toString()
-      )
-      setTestSessions(sessionData)
-
-      // Load progress data
-      const progress = await profileService.getStudentProgress(
-        selectedStudent._id
-      )
-      setProgressData(progress)
-    } catch (error) {
-      console.error('Error loading student data:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const loadActiveSpeechSessions = async () => {
-    try {
-      // Get active pronunciation practice sessions for all students
-      const activeSessionsData = await profileService.getActiveSpeechSessions(
-        user.profile
-      )
-      setActiveSpeechSessions(activeSessionsData.sessions || [])
-
-      // Calculate real-time metrics
-      const metrics = calculateSpeechMetrics(activeSessionsData.sessions || [])
-      setSpeechMetrics(metrics)
-    } catch (error) {
-      console.error('Error loading active speech sessions:', error)
-    }
-  }
-
-  const calculateSpeechMetrics = (sessions) => {
-    if (!sessions.length) {
-      return {
-        totalActiveSessions: 0,
-        averageConfidence: 0,
-        studentsNeedingHelp: [],
-        totalWordsCompleted: 0
-      }
-    }
-
-    const totalSessions = sessions.length
-    const totalConfidence = sessions.reduce(
-      (sum, session) => sum + (session.confidence || 0),
-      0
-    )
-    const averageConfidence = Math.round(totalConfidence / totalSessions)
-
-    const totalWords = sessions.reduce(
-      (sum, session) => sum + (session.wordsCompleted || 0),
-      0
-    )
-
-    const studentsNeedingHelp = sessions.filter(
-      (session) =>
-        session.confidence < 70 ||
-        session.responseTime > 4000 ||
-        session.strugglingWords?.length > 0
-    )
-
-    return {
-      totalActiveSessions: totalSessions,
-      averageConfidence,
-      studentsNeedingHelp,
-      totalWordsCompleted: totalWords
-    }
-  }
+  }, [activeTab, autoRefresh, loadActiveSpeechSessions])
 
   const calculateOverallAccuracy = useCallback(() => {
     if (!assessments.length) return 0

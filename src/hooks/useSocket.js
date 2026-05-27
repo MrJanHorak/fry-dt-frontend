@@ -3,58 +3,79 @@
  * Handles connection, disconnection, and event listeners
  */
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { io } from 'socket.io-client'
 import { SOCKET_URL } from '../config/runtime'
+
+const isSocketLike = (value) =>
+  Boolean(value && typeof value === 'object' && typeof value.emit === 'function')
 
 const useSocket = (socketOrPath = SOCKET_URL) => {
   const socketRef = useRef(null)
   const listenersRef = useRef(new Map())
+  const [socketInstance, setSocketInstance] = useState(() =>
+    isSocketLike(socketOrPath) ? socketOrPath : null
+  )
+  const [isConnected, setIsConnected] = useState(() =>
+    Boolean(isSocketLike(socketOrPath) && socketOrPath.connected)
+  )
+
+  const clearTrackedListeners = useCallback((socket) => {
+    listenersRef.current.forEach((handlers, event) => {
+      handlers.forEach((handler) => {
+        socket.off(event, handler)
+      })
+    })
+    listenersRef.current.clear()
+  }, [])
 
   // Initialize socket connection
   useEffect(() => {
-    // Check if we received an existing socket object or a path string
-    if (socketOrPath && typeof socketOrPath === 'object' && socketOrPath.emit) {
-      // Use existing socket object
-      socketRef.current = socketOrPath
-    } else {
-      // Create new socket connection with the provided path
-      socketRef.current = io(socketOrPath, {
-        transports: ['websocket'],
-        upgrade: true,
-        rememberUpgrade: true
-      })
+    const usingExistingSocket = isSocketLike(socketOrPath)
+    const socket = usingExistingSocket
+      ? socketOrPath
+      : io(socketOrPath, {
+          transports: ['websocket'],
+          upgrade: true,
+          rememberUpgrade: true
+        })
+
+    socketRef.current = socket
+    setSocketInstance(socket)
+    setIsConnected(Boolean(socket.connected))
+
+    const handleConnect = () => {
+      setIsConnected(true)
+      console.log('Connected to server:', socket.id)
     }
 
-    const socket = socketRef.current
-
-    // Only set up event handlers if we created a new socket connection
-    if (typeof socketOrPath === 'string' || !socketOrPath) {
-      // Connection event handlers for new connections
-      socket.on('connect', () => {
-        console.log('Connected to server:', socket.id)
-      })
-
-      socket.on('disconnect', (reason) => {
-        console.log('Disconnected from server:', reason)
-      })
-
-      socket.on('connect_error', (error) => {
-        console.error('Connection error:', error)
-      })
+    const handleDisconnect = (reason) => {
+      setIsConnected(false)
+      console.log('Disconnected from server:', reason)
     }
 
-    // Cleanup on unmount
+    const handleConnectError = (error) => {
+      setIsConnected(false)
+      console.error('Connection error:', error)
+    }
+
+    socket.on('connect', handleConnect)
+    socket.on('disconnect', handleDisconnect)
+    socket.on('connect_error', handleConnectError)
+
     return () => {
-      // Only cleanup listeners if we created the socket
-      if (typeof socketOrPath === 'string' || !socketOrPath) {
-        if (socketRef.current) {
-          socketRef.current.disconnect()
-          socketRef.current = null
-        }
+      socket.off('connect', handleConnect)
+      socket.off('disconnect', handleDisconnect)
+      socket.off('connect_error', handleConnectError)
+      clearTrackedListeners(socket)
+
+      if (!usingExistingSocket) {
+        socket.disconnect()
       }
+
+      socketRef.current = null
     }
-  }, [socketOrPath])
+  }, [socketOrPath, clearTrackedListeners])
 
   // Add event listener
   const addEventListener = useCallback((event, handler) => {
@@ -126,11 +147,8 @@ const useSocket = (socketOrPath = SOCKET_URL) => {
     [emit]
   )
 
-  // Get connection status
-  const isConnected = socketRef.current?.connected || false
-
   return {
-    socket: socketRef.current,
+    socket: socketRef.current || socketInstance,
     isConnected,
     addEventListener,
     removeEventListener,

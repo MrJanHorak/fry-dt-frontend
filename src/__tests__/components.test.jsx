@@ -1,197 +1,154 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import useSocket from '../../hooks/useSocket'
+import React from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import {
+  cleanup,
+  fireEvent,
+  render,
+  renderHook,
+  screen
+} from '@testing-library/react'
+import useSocket from '../hooks/useSocket'
+import FlashCard from '../components/FlashCard/FlashCard'
+import WordStats from '../components/WordStats/WordStats'
 
-// Mock the socket.io-client
-const mockSocket = {
-  on: vi.fn(),
-  off: vi.fn(),
-  emit: vi.fn(),
-  connected: true,
-  disconnect: vi.fn(),
-  connect: vi.fn()
-}
+const mockSpeak = vi.fn(() => true)
+const mockGetPreferredVoice = vi.fn(() => null)
 
-// Mock the useSocket hook
-vi.mock('../../hooks/useSocket', () => ({
-  default: vi.fn()
+vi.mock('../hooks/useSpeechSynthesis', () => ({
+  default: vi.fn(() => ({
+    speak: mockSpeak,
+    speaking: false,
+    supported: true,
+    error: null,
+    getPreferredVoice: mockGetPreferredVoice
+  }))
 }))
 
-describe('useSocket Hook', () => {
+describe('useSocket hook', () => {
+  let mockSocket
+
   beforeEach(() => {
-    vi.clearAllMocks()
-    useSocket.mockReturnValue({
-      isConnected: true,
-      emit: mockSocket.emit,
-      on: mockSocket.on,
-      off: mockSocket.off,
-      socket: mockSocket
-    })
+    mockSocket = {
+      on: vi.fn(),
+      off: vi.fn(),
+      emit: vi.fn(),
+      connected: true,
+      disconnect: vi.fn(),
+      id: 'socket-1'
+    }
   })
 
   afterEach(() => {
-    vi.restoreAllMocks()
+    cleanup()
+    vi.clearAllMocks()
   })
 
-  it('should provide socket functionality', () => {
-    const { isConnected, emit, on, off } = useSocket(mockSocket)
+  it('reports connection state for a provided socket instance', () => {
+    const { result } = renderHook(() => useSocket(mockSocket))
 
-    expect(isConnected).toBe(true)
-    expect(emit).toBeDefined()
-    expect(on).toBeDefined()
-    expect(off).toBeDefined()
+    expect(result.current.socket).toBe(mockSocket)
+    expect(result.current.isConnected).toBe(true)
   })
 
-  it('should handle socket events correctly', () => {
-    const { on, off } = useSocket(mockSocket)
-    const testHandler = vi.fn()
+  it('subscribes and unsubscribes listeners through the socket instance', () => {
+    const { result } = renderHook(() => useSocket(mockSocket))
+    const handler = vi.fn()
 
-    on('test_event', testHandler)
-    expect(mockSocket.on).toHaveBeenCalledWith('test_event', testHandler)
+    result.current.on('test_event', handler)
+    expect(mockSocket.on).toHaveBeenCalledWith('test_event', handler)
 
-    off('test_event', testHandler)
-    expect(mockSocket.off).toHaveBeenCalledWith('test_event', testHandler)
+    result.current.off('test_event', handler)
+    expect(mockSocket.off).toHaveBeenCalledWith('test_event', handler)
   })
 
-  it('should emit events correctly', () => {
-    const { emit } = useSocket(mockSocket)
-    const testData = { message: 'test' }
+  it('emits events when the socket is connected', () => {
+    const { result } = renderHook(() => useSocket(mockSocket))
+    const payload = { message: 'hello' }
 
-    emit('test_event', testData)
-    expect(mockSocket.emit).toHaveBeenCalledWith('test_event', testData)
+    result.current.emit('test_event', payload)
+
+    expect(mockSocket.emit).toHaveBeenCalledWith('test_event', payload)
   })
 })
 
-// Test for FlashCard component
-describe('FlashCard Component Accessibility', () => {
-  const mockProps = {
-    profile: { name: 'Test User' },
-    displayWord: { word: 'test', definition: 'a test word' },
+describe('FlashCard component', () => {
+  const baseProps = {
+    profile: { rate: 1, pitch: 1, volume: 1, voice: 0 },
+    displayWord: 'test',
     handleClick: vi.fn(),
     handleBack: vi.fn(),
-    test: false
+    isTest: true
   }
 
-  it('should have proper ARIA labels', async () => {
-    const { container } = render(<FlashCard {...mockProps} />)
+  afterEach(() => {
+    cleanup()
+    vi.clearAllMocks()
+  })
 
-    expect(screen.getByRole('main')).toHaveAttribute(
-      'aria-label',
-      'Flash card interface'
-    )
-    expect(screen.getByRole('button', { name: /correct/i })).toBeInTheDocument()
+  it('renders the flashcard controls and current word', () => {
+    render(<FlashCard {...baseProps} />)
+
     expect(
-      screen.getByRole('button', { name: /incorrect/i })
+      screen.getByRole('main', { name: /flashcard practice/i })
     ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'test' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /previous word/i })
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /next word/i })).toBeInTheDocument()
   })
 
-  it('should handle keyboard navigation', async () => {
-    render(<FlashCard {...mockProps} />)
-    const container = screen.getByRole('main')
+  it('handles keyboard navigation shortcuts', () => {
+    render(<FlashCard {...baseProps} />)
 
-    fireEvent.keyDown(container, { key: 'ArrowRight' })
-    await waitFor(() => {
-      expect(mockProps.handleClick).toHaveBeenCalledWith(true)
-    })
+    fireEvent.keyDown(window, { key: 'ArrowLeft' })
+    fireEvent.keyDown(window, { key: 'ArrowRight' })
 
-    fireEvent.keyDown(container, { key: 'ArrowLeft' })
-    await waitFor(() => {
-      expect(mockProps.handleClick).toHaveBeenCalledWith(false)
-    })
-  })
-
-  it('should announce word changes to screen readers', async () => {
-    render(<FlashCard {...mockProps} />)
-
-    const announcement = screen.getByRole('status')
-    expect(announcement).toHaveAttribute('aria-live', 'polite')
+    expect(baseProps.handleBack).toHaveBeenCalledTimes(1)
+    expect(baseProps.handleClick).toHaveBeenCalledTimes(1)
   })
 })
 
-// Test for error handling middleware
-describe('Error Handling', () => {
-  it('should handle async errors correctly', async () => {
-    const mockReq = {}
-    const mockRes = {
-      status: vi.fn().mockReturnThis(),
-      json: vi.fn()
-    }
-    const mockNext = vi.fn()
-
-    const errorHandler = async (req, res, next) => {
-      try {
-        throw new Error('Test error')
-      } catch (error) {
-        res.status(500).json({ err: error.message })
+describe('WordStats component', () => {
+  const populatedProfile = {
+    practicedWords: [
+      {
+        _id: 'word-1',
+        word: 'the',
+        timesPracticed: 5,
+        timesCorrect: 4,
+        timesIncorrect: 1,
+        recordOfWrongs: ['teh']
+      },
+      {
+        _id: 'word-2',
+        word: 'and',
+        timesPracticed: 2,
+        timesCorrect: 2,
+        timesIncorrect: 0,
+        recordOfWrongs: []
       }
-    }
-
-    await errorHandler(mockReq, mockRes, mockNext)
-
-    expect(mockRes.status).toHaveBeenCalledWith(500)
-    expect(mockRes.json).toHaveBeenCalledWith({ err: 'Test error' })
-  })
-})
-
-// Test for validation middleware
-describe('Validation Middleware', () => {
-  it('should validate practiced word data', () => {
-    const validData = {
-      word: 'test',
-      mastered: false,
-      timesPracticed: 1,
-      timesCorrect: 1,
-      timesIncorrect: 0
-    }
-
-    const invalidData = {
-      word: '',
-      timesPracticed: -1
-    }
-
-    // Mock validation function
-    const validatePracticedWord = (data) => {
-      if (!data.word || data.word.trim() === '') return false
-      if (data.timesPracticed < 0) return false
-      return true
-    }
-
-    expect(validatePracticedWord(validData)).toBe(true)
-    expect(validatePracticedWord(invalidData)).toBe(false)
-  })
-})
-
-// Test for WordStats component performance
-describe('WordStats Performance', () => {
-  const mockProfile = {
-    practicedWords: Array.from({ length: 100 }, (_, i) => ({
-      _id: `word-${i}`,
-      word: `word${i}`,
-      timesPracticed: Math.floor(Math.random() * 10),
-      timesCorrect: Math.floor(Math.random() * 5),
-      timesIncorrect: Math.floor(Math.random() * 5),
-      mastered: Math.random() > 0.5
-    }))
+    ]
   }
 
-  it('should render large word lists efficiently', () => {
-    const startTime = performance.now()
-    render(<WordStats userProfile={mockProfile} />)
-    const endTime = performance.now()
-
-    // Should render within reasonable time (less than 100ms)
-    expect(endTime - startTime).toBeLessThan(100)
+  afterEach(() => {
+    cleanup()
   })
 
-  it('should memoize calculations for better performance', () => {
-    const { rerender } = render(<WordStats userProfile={mockProfile} />)
+  it('renders practiced word statistics', () => {
+    render(<WordStats userProfile={populatedProfile} />)
 
-    // Spy on useMemo to ensure calculations are memoized
-    const memoSpy = vi.spyOn(React, 'useMemo')
+    expect(
+      screen.getByRole('main', { name: /word statistics/i })
+    ).toBeInTheDocument()
+    expect(screen.getByText(/Total Practiced Words: 2/i)).toBeInTheDocument()
+    expect(screen.getByText('the')).toBeInTheDocument()
+    expect(screen.getByText('and')).toBeInTheDocument()
+  })
 
-    rerender(<WordStats userProfile={mockProfile} />)
+  it('shows the empty state when there are no practiced words', () => {
+    render(<WordStats userProfile={{ practicedWords: [] }} />)
 
-    // Should not recalculate if profile hasn't changed
-    expect(memoSpy).toHaveBeenCalled()
+    expect(screen.getByText(/No practiced words yet/i)).toBeInTheDocument()
   })
 })

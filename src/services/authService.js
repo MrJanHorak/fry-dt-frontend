@@ -6,7 +6,7 @@ const getErrorMessage = (payload, fallback) => {
     return payload.details.join(', ')
   }
 
-  return payload?.err || fallback
+  return payload?.err || payload?.msg || payload?.error?.message || fallback
 }
 
 async function signup(user) {

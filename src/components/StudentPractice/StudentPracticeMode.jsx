@@ -42,11 +42,25 @@ const StudentPracticeMode = ({ socket }) => {
     browserSupport
   } = useSpeechRecognition()
 
+  const loadStudentData = useCallback(async () => {
+    if (!user?.profile) return
+
+    try {
+      setLoading(true)
+      const progress = await profileService.getStudentProgress(user.profile)
+      setStudentProgress(progress)
+    } catch (error) {
+      console.error('Error loading student data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [user?.profile])
+
   useEffect(() => {
     if (user?.profile) {
       loadStudentData()
     }
-  }, [user])
+  }, [loadStudentData, user?.profile])
 
   useEffect(() => {
     if (studentProgress) {
@@ -87,18 +101,6 @@ const StudentPracticeMode = ({ socket }) => {
     score.total,
     isListening
   ])
-
-  const loadStudentData = async () => {
-    try {
-      setLoading(true)
-      const progress = await profileService.getStudentProgress(user.profile)
-      setStudentProgress(progress)
-    } catch (error) {
-      console.error('Error loading student data:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const startPracticeSession = useCallback(() => {
     const words = fryWordService.generateTestWordSet(
@@ -148,7 +150,6 @@ const StudentPracticeMode = ({ socket }) => {
       }
     }
   }, [
-    sessionActive,
     score,
     practiceWords,
     practiceMode,
@@ -230,6 +231,7 @@ const StudentPracticeMode = ({ socket }) => {
       practiceWords,
       currentWordIndex,
       currentLevel,
+      nextWord,
       user.profile,
       practiceSettings
     ]

@@ -3,16 +3,18 @@ import './Landing.css'
 
 /**
  * Landing page component.
- * 
- * @param {Object} props - The component props.
- * @param {Object} props.user - The user object.
+ *
  * @returns {JSX.Element} The rendered Landing component.
  */
-export default function Landing({ user }) {
+export default function Landing() {
   return (
     <div id="landing-page">
       <h2>FRY Word Diagnosis Tool</h2>
-      <img src="src/assets/logo/fry-diagnosis-tool.png" alt="logo" className="logo" />
+      <img
+        src="src/assets/logo/fry-diagnosis-tool.png"
+        alt="logo"
+        className="logo"
+      />
       <div className="flashcard">
         <p className="intro">
           This tool is designed to help teachers test a students ability to

@@ -14,12 +14,12 @@ const ReadQr = ({ handleSignupOrLogin }) => {
   const [showScanner, setShowScanner] = useState(false)
 
   const handleScan = async (result) => {
-    if (!!result) {
-      let resultTextSplit = result?.text.split(',')
-      let qrNameDecrypt = CryptoJS.AES.decrypt(resultTextSplit[0], encryptKey)
-      let qrName = await JSON.parse(qrNameDecrypt.toString(CryptoJS.enc.Utf8))
-      let qrPwDecrypt = CryptoJS.AES.decrypt(resultTextSplit[1], encryptKey)
-      let qrPw = await JSON.parse(qrPwDecrypt.toString(CryptoJS.enc.Utf8))
+    if (result) {
+      const resultTextSplit = result.text.split(',')
+      const qrNameDecrypt = CryptoJS.AES.decrypt(resultTextSplit[0], encryptKey)
+      const qrName = JSON.parse(qrNameDecrypt.toString(CryptoJS.enc.Utf8))
+      const qrPwDecrypt = CryptoJS.AES.decrypt(resultTextSplit[1], encryptKey)
+      const qrPw = JSON.parse(qrPwDecrypt.toString(CryptoJS.enc.Utf8))
       try {
         await login({ name: qrName, pw: qrPw })
         handleSignupOrLogin()

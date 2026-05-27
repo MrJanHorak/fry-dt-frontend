@@ -1,27 +1,27 @@
-import styles from './styles.module.css';
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import styles from './styles.module.css'
 
-const RoomAndUsers = ({ socket, username, user, setRoomUsers, room }) => {
-  const [roomUsers, setRoomUrs] = useState([]);
-
-  const navigate = useNavigate();
+const RoomAndUsers = ({ socket, username, setRoomUsers, room }) => {
+  const [roomUsers, setRoomUsersState] = useState([])
+  const navigate = useNavigate()
 
   useEffect(() => {
-    socket.on('chatroom_users', (data) => {
-      setRoomUrs(data);
+    const handleChatroomUsers = (data) => {
+      setRoomUsersState(data)
       setRoomUsers(data)
-    });
+    }
 
-    return () => socket.off('chatroom_users');
-  }, [socket]);
+    socket.on('chatroom_users', handleChatroomUsers)
+
+    return () => socket.off('chatroom_users', handleChatroomUsers)
+  }, [setRoomUsers, socket])
 
   const leaveRoom = () => {
-    const __createdtime__ = Date.now();
-    socket.emit('leave_room', { username, room, __createdtime__ });
-    // Redirect to home page
-    navigate('/', { replace: true });
-  };
+    const __createdtime__ = Date.now()
+    socket.emit('leave_room', { username, room, __createdtime__ })
+    navigate('/', { replace: true })
+  }
 
   return (
     <div className={styles.roomAndUsersColumn}>
@@ -30,25 +30,25 @@ const RoomAndUsers = ({ socket, username, user, setRoomUsers, room }) => {
       <div>
         {roomUsers.length > 0 && <h5 className={styles.usersTitle}>Users:</h5>}
         <ul className={styles.usersList}>
-          {roomUsers.map((user) => (
+          {roomUsers.map((roomUser) => (
             <li
               style={{
-                fontWeight: `${user.username === username ? 'bold' : 'normal'}`,
-                color: `${user.user.role === 'teacher' ? 'red' : 'black'}`,
+                fontWeight: roomUser.username === username ? 'bold' : 'normal',
+                color: roomUser.user?.role === 'teacher' ? 'red' : 'black'
               }}
-              key={user.id}
+              key={roomUser.id}
             >
-              {user.username}
+              {roomUser.username}
             </li>
           ))}
         </ul>
       </div>
 
-      <button className='btn btn-outline' onClick={leaveRoom}>
+      <button className="btn btn-outline" onClick={leaveRoom} type="button">
         Leave
       </button>
     </div>
-  );
-};
+  )
+}
 
-export default RoomAndUsers;
+export default RoomAndUsers

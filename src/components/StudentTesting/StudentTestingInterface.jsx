@@ -9,7 +9,7 @@ import styles from './styles.module.css'
 const RECOGNITION_COUNTDOWN_START = 3
 const RECOGNITION_LISTEN_WINDOW_MS = 4000
 
-const StudentTestingInterface = ({ user, room, socket }) => {
+const StudentTestingInterface = ({ user, socket }) => {
   const navigate = useNavigate()
   const { emit, on, off, isConnected } = useSocket(socket)
 

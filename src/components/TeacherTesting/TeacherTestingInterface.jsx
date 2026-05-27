@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
 import useSocket from '../../hooks/useSocket'
 import useSpeechSynthesis from '../../hooks/useSpeechSynthesis'
 import fryWordService from '../../services/fryWordService'
@@ -7,7 +6,6 @@ import { getProfileById } from '../../services/profileService'
 import styles from './styles.module.css'
 
 const TeacherTestingInterface = ({ user, room, socket }) => {
-  const navigate = useNavigate()
   const { emit, on, off, isConnected } = useSocket(socket)
   const { speak, speaking, supported: speechSupported } = useSpeechSynthesis()
 
@@ -20,7 +18,6 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
   const [studentResponses, setStudentResponses] = useState([])
   const [connectedStudents, setConnectedStudents] = useState([])
   const [studentProfiles, setStudentProfiles] = useState({})
-  const [sessionNotes, setSessionNotes] = useState('')
 
   // Assessment state
   const [currentAssessment, setCurrentAssessment] = useState(null)
@@ -33,6 +30,7 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
   const [error, setError] = useState(null)
 
   const sessionIdRef = useRef(null)
+  const loadedStudentProfilesRef = useRef(new Set())
 
   // Generate session ID
   const generateSessionId = () => {
@@ -71,21 +69,28 @@ const TeacherTestingInterface = ({ user, room, socket }) => {
       const students = users.filter((u) => u.user?.role === 'student')
       setConnectedStudents(students)
 
-      // Fetch profiles for connected students
       students.forEach(async (student) => {
         const studentProfileId = student.user?.profile || student.user?._id
 
-        if (studentProfileId && !studentProfiles[studentProfileId]) {
-          try {
-            const profile = await getProfileById(studentProfileId)
+        if (
+          !studentProfileId ||
+          loadedStudentProfilesRef.current.has(studentProfileId)
+        ) {
+          return
+        }
+
+        loadedStudentProfilesRef.current.add(studentProfileId)
+        getProfileById(studentProfileId)
+          .then((profile) => {
             setStudentProfiles((prev) => ({
               ...prev,
               [studentProfileId]: profile
             }))
-          } catch (error) {
+          })
+          .catch((error) => {
+            loadedStudentProfilesRef.current.delete(studentProfileId)
             console.log('Error fetching student profile:', error)
-          }
-        }
+          })
       })
     }
 

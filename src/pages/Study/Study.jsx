@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import words from '../../assets/FryWordList.json'
 
 // Services
@@ -11,52 +11,50 @@ import FlashCard from '../../components/FlashCard/FlashCard'
 import './Study.css'
 
 function Study({ user }) {
-  const [gradeLevelWords, setgradeLevelWords] = useState()
   const [click, setClick] = useState(0)
   const [profile, setProfile] = useState()
 
-  let displayWord = []
-  let studyList = []
-
-  const handleClick = (e) => {
-    setClick(click + 1)
-  }
-  const handleBack = (e) => {
-    click === 0 ? setClick(gradeLevelWords.length - 1) : setClick(click - 1)
-  }
-
   useEffect(() => {
     const getProfile = async () => {
-      try {
-        const profileData = await getProfileById(user.profile)
-        setProfile(profileData)
-      } catch (error) {
-        throw error
-      }
+      const profileData = await getProfileById(user.profile)
+      setProfile(profileData)
     }
     getProfile()
   }, [user.profile])
 
-  useEffect(() => {
-    if (profile?.grade) {
-      for (const key in words) {
-        if (key <= profile.grade * 100) {
-          studyList.push(words[key][1])
-        }
-        setgradeLevelWords(studyList)
-      }
-    }
-  }, [profile, user.profile])
+  const gradeLevelWords = useMemo(() => {
+    if (!profile?.grade) return []
 
-  if (gradeLevelWords) {
-    if (click >= gradeLevelWords.length) {
-      displayWord = []
+    return Object.entries(words)
+      .filter(([key]) => Number(key) <= profile.grade * 100)
+      .map(([, value]) => value[1])
+  }, [profile?.grade])
+
+  useEffect(() => {
+    if (!gradeLevelWords.length) {
       setClick(0)
+      return
     }
-    if (click < gradeLevelWords.length) {
-    }
-    displayWord = gradeLevelWords[click]
+
+    setClick((prevClick) =>
+      prevClick >= gradeLevelWords.length ? 0 : prevClick
+    )
+  }, [gradeLevelWords.length])
+
+  const handleClick = () => {
+    setClick((prevClick) =>
+      gradeLevelWords.length ? (prevClick + 1) % gradeLevelWords.length : 0
+    )
   }
+
+  const handleBack = () => {
+    setClick((prevClick) => {
+      if (!gradeLevelWords.length) return 0
+      return prevClick === 0 ? gradeLevelWords.length - 1 : prevClick - 1
+    })
+  }
+
+  const displayWord = gradeLevelWords[click] ?? null
 
   return (
     <div id="study-page">
@@ -66,7 +64,7 @@ function Study({ user }) {
           handleClick={handleClick}
           handleBack={handleBack}
           displayWord={displayWord}
-          test={false}
+          isTest={false}
         />
       </div>
     </div>

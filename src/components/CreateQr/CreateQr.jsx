@@ -10,8 +10,13 @@ const CreateQr = ({ user, pw }) => {
 
   useEffect(() => {
     const generateQRCodesAndUpdatePasswords = async () => {
+      if (!encryptKey || !pw || !user?.students?.length) {
+        setQrCards([])
+        return
+      }
+
       const qrCodes = user.students.map((student) => {
-        let qrValue = [
+        const qrValue = [
           CryptoJS.AES.encrypt(
             JSON.stringify(student.name),
             encryptKey
@@ -79,7 +84,7 @@ const CreateQr = ({ user, pw }) => {
     }
 
     generateQRCodesAndUpdatePasswords()
-  }, [user, pw])
+  }, [encryptKey, pw, user])
 
   return (
     <div

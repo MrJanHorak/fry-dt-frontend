@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 // import { createPortal } from 'react-dom'
 import Collapsible from 'react-collapsible'
 import NewWindow from 'react-new-window'
@@ -15,7 +15,6 @@ import WordStats from '../../components/WordStats/WordStats'
 import AddStudent from '../../components/AddStudent/AddStudent'
 import ShowStudents from '../../components/ShowStudents/ShowStudents'
 import CreateQr from '../../components/CreateQr/CreateQr'
-import CryptoJS from 'crypto-js'
 
 /**
  * Renders the user profile page.
@@ -25,7 +24,6 @@ import CryptoJS from 'crypto-js'
  * @returns {JSX.Element} The rendered profile page.
  */
 const Profile = ({ user }) => {
-  const encryptKey = import.meta.env.VITE_REACT_APP_ENCRYPTKEY
   const [userProfile, setUserProfile] = useState()
   const [popup, setPopup] = useState(false)
   const [click, setClick] = useState(false)
@@ -44,15 +42,13 @@ const Profile = ({ user }) => {
   const [qr, setQr] = useState('')
 
   const added = () => {
-    setStudentAdded(studentAdded + 1)
+    setStudentAdded((prevStudentAdded) => prevStudentAdded + 1)
   }
 
   useEffect(() => {
     const getProfile = async () => {
       try {
-        console.log(user)
         const profileData = await getProfileById(user.profile)
-        console.log(profileData)
         setFormData({
           name: profileData.name,
           email: profileData.email,

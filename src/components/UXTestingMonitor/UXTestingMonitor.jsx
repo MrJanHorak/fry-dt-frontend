@@ -3,12 +3,10 @@
  * Provides comprehensive UX testing and monitoring capabilities
  */
 
-import React, { useState, useEffect, useContext } from 'react'
-import { PerformanceContext } from '../../contexts/PerformanceContext'
+import React, { useState, useEffect } from 'react'
 import './UXTestingMonitor.css'
 
 const UXTestingMonitor = () => {
-  const { performanceData } = useContext(PerformanceContext)
   const [uxData, setUxData] = useState({
     testResults: null,
     feedback: [],
@@ -89,7 +87,7 @@ const UXTestingMonitor = () => {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const data = await response.json()
+      await response.json()
       alert('Feedback submitted successfully!')
 
       // Reset form

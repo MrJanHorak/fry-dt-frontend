@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { usePerformance } from '../../hooks/usePerformance'
 import './PerformanceMonitor.css'
 
 /**
@@ -21,7 +20,6 @@ const PerformanceMonitor = ({ isVisible = false }) => {
 
   const [isRecording, setIsRecording] = useState(false)
   const intervalRef = useRef(null)
-  const { performance: perfAPI } = usePerformance()
 
   // Core Web Vitals measurement
   useEffect(() => {

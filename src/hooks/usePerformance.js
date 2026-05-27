@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback } from 'react'
  */
 export const usePerformance = () => {
   const [isSupported, setIsSupported] = useState(false)
-  const [metrics, setMetrics] = useState({})
+  const [metrics] = useState({})
   const [webVitals, setWebVitals] = useState({
     lcp: null,
     fid: null,

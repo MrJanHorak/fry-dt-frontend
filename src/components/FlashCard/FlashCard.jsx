@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { RiUserVoiceFill } from 'react-icons/ri'
 import { IoArrowBack, IoArrowForward } from 'react-icons/io5'
-import { MdVolumeOff, MdVolumeUp } from 'react-icons/md'
+import { MdVolumeOff } from 'react-icons/md'
 import useSpeechSynthesis from '../../hooks/useSpeechSynthesis'
 import { LoadingSpinner } from '../Loading/Loading'
 
