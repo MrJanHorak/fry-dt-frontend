@@ -8,6 +8,7 @@ import {
 } from 'react-router-dom'
 import io from 'socket.io-client'
 import './App.css'
+import { SOCKET_URL } from './config/runtime'
 
 // Context Providers
 import { useAuth } from './contexts/AuthContext'
@@ -26,7 +27,7 @@ import MonitoringDashboard from './components/MonitoringDashboard/MonitoringDash
 import TeacherDashboard from './components/TeacherDashboard/TeacherDashboard'
 import StudentPracticeMode from './components/StudentPractice/StudentPracticeMode'
 
-const socket = io.connect('http://localhost:3000')
+const socket = io.connect(SOCKET_URL)
 
 const generateSessionCode = () =>
   `SESSION-${Math.random().toString(36).slice(2, 8).toUpperCase()}`

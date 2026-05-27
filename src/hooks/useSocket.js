@@ -5,10 +5,9 @@
 
 import { useEffect, useRef, useCallback } from 'react'
 import { io } from 'socket.io-client'
+import { SOCKET_URL } from '../config/runtime'
 
-const useSocket = (
-  socketOrPath = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000'
-) => {
+const useSocket = (socketOrPath = SOCKET_URL) => {
   const socketRef = useRef(null)
   const listenersRef = useRef(new Map())
 

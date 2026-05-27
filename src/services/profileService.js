@@ -1,5 +1,5 @@
 import * as tokenService from './tokenService'
-const BASE_URL = 'http://localhost:3000/api/profiles'
+import { PROFILES_API_BASE_URL as BASE_URL } from '../config/runtime'
 
 export const getProfileById = async (profileId) => {
   if (profileId === null || profileId === undefined) {

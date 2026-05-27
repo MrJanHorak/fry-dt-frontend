@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "build:staging": "NODE_ENV=staging vite build",
-    "build:production": "NODE_ENV=production vite build",
+    "build:staging": "vite build --mode staging",
+    "build:production": "vite build --mode production",
     "build:analyze": "ANALYZE_BUNDLE=true vite build",
     "preview": "vite preview",
     "preview:dist": "vite preview --port 3000",

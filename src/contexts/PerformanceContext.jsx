@@ -11,6 +11,7 @@ import React, {
   useCallback
 } from 'react'
 import { usePerformance } from '../hooks/usePerformance'
+import { API_BASE_URL } from '../config/runtime'
 
 const PerformanceContext = createContext()
 
@@ -51,8 +52,7 @@ export const PerformanceProvider = ({ children }) => {
       const token = localStorage.getItem('token')
       if (!token) return
 
-      const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
-      const response = await fetch(`${baseURL}/api/performance/summary`, {
+      const response = await fetch(`${API_BASE_URL}/api/performance/summary`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -76,8 +76,7 @@ export const PerformanceProvider = ({ children }) => {
       const token = localStorage.getItem('token')
       if (!token) return
 
-      const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
-      const response = await fetch(`${baseURL}/api/performance/alerts`, {
+      const response = await fetch(`${API_BASE_URL}/api/performance/alerts`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -276,7 +275,7 @@ export const PerformanceProvider = ({ children }) => {
 
   // Auto-start monitoring in development mode
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       startMonitoring()
     }
   }, [startMonitoring])

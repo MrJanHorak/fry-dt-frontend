@@ -5,10 +5,11 @@
 
 import React from 'react'
 import { usePerformanceContext } from '../contexts/PerformanceContext'
+import { API_BASE_URL } from '../config/runtime'
 
 class ApiService {
   constructor() {
-    this.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3000'
+    this.baseURL = API_BASE_URL
     this.defaultOptions = {
       headers: {
         'Content-Type': 'application/json'

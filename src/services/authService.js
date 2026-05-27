@@ -1,5 +1,5 @@
 import * as tokenService from './tokenService'
-const BASE_URL = 'http://localhost:3000/api/auth'
+import { AUTH_API_BASE_URL as BASE_URL } from '../config/runtime'
 
 const getErrorMessage = (payload, fallback) => {
   if (payload?.details?.length) {
