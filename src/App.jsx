@@ -27,6 +27,13 @@ import Chat from './components/Chat/Chat'
 import MonitoringDashboard from './components/MonitoringDashboard/MonitoringDashboard'
 import TeacherDashboard from './components/TeacherDashboard/TeacherDashboard'
 import StudentPracticeMode from './components/StudentPractice/StudentPracticeMode'
+import Practice from './pages/Practice/Practice'
+import MyProgress from './pages/MyProgress/MyProgress'
+import AccessibilitySettings from './components/AccessibilitySettings/AccessibilitySettings'
+import ClassProgress from './pages/Teacher/ClassProgress'
+import Assignments from './pages/Teacher/Assignments'
+import StudentDetail from './pages/Teacher/StudentDetail'
+import Benchmark from './pages/Teacher/Benchmark'
 
 // The socket only connects once someone is signed in, and sends the same JWT
 // the REST API uses (the server rejects unauthenticated sockets).
@@ -89,6 +96,8 @@ const App = () => {
   const isAdmin = Boolean(user?.isAdmin)
   const isTeacher = isAdmin || user?.role === 'teacher'
   const isStudent = user?.role === 'student'
+  // Teachers and parents both look after students
+  const isEducator = isTeacher || user?.role === 'parent'
   const canAccessTesting = isTeacher || isStudent
 
   const renderProtectedRoute = (element) =>
@@ -225,8 +234,14 @@ const App = () => {
   return (
     <PerformanceProvider>
       <div className="App">
-        <Nav user={user} handleLogout={handleLogout} />
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
+        <div className="hide-in-focus-mode">
+          <Nav user={user} handleLogout={handleLogout} />
+        </div>
         {user && (import.meta.env.DEV || isAdmin) && <MonitoringDashboard />}
+        <main id="main-content" tabIndex={-1} style={{ outline: 'none' }}>
         <Routes>
           <Route path="/" element={<Landing user={user} />} />
           <Route
@@ -291,8 +306,35 @@ const App = () => {
             )}
           />
 
+          <Route
+            path="/practice"
+            element={renderRoleProtectedRoute(isStudent, <Practice />)}
+          />
+          <Route
+            path="/my-progress"
+            element={renderRoleProtectedRoute(isStudent, <MyProgress />)}
+          />
+          <Route path="/settings/reading" element={<AccessibilitySettings />} />
+          <Route
+            path="/class"
+            element={renderRoleProtectedRoute(isEducator, <ClassProgress />)}
+          />
+          <Route
+            path="/assignments"
+            element={renderRoleProtectedRoute(isEducator, <Assignments />)}
+          />
+          <Route
+            path="/students/:id"
+            element={renderRoleProtectedRoute(isEducator, <StudentDetail />)}
+          />
+          <Route
+            path="/students/:id/benchmark"
+            element={renderRoleProtectedRoute(isEducator, <Benchmark />)}
+          />
+
           {/* <Route path='/admin' element={<Admin user={user} />} /> */}
         </Routes>
+        </main>
       </div>
     </PerformanceProvider>
   )

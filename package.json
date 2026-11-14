@@ -20,6 +20,9 @@
     "serve": "serve -s dist -l 3000"
   },
   "dependencies": {
+    "@fontsource/atkinson-hyperlegible": "^5.3.0",
+    "@fontsource/lexend": "^5.3.0",
+    "@fontsource/opendyslexic": "^5.3.0",
     "@yudiel/react-qr-scanner": "^2.6.0",
     "buffer": "^6.0.3",
     "react": "^18.2.0",

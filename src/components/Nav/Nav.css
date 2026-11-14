@@ -163,3 +163,23 @@
     border-left: none;
   }
 }
+
+/* Closed menu must not be reachable by keyboard or screen readers */
+.menuNav[hidden] {
+  display: none !important;
+}
+.menuNav.showMenu {
+  height: auto;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  padding-bottom: 1rem;
+}
+.nav-links {
+  flex-wrap: wrap;
+}
+.nav-links a.active,
+.menuNav a.active {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+  font-weight: 700;
+}
