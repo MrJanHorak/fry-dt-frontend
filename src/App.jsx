@@ -9,6 +9,7 @@ import {
 import io from 'socket.io-client'
 import './App.css'
 import { SOCKET_URL } from './config/runtime'
+import { getToken } from './services/tokenService'
 
 // Context Providers
 import { useAuth } from './contexts/AuthContext'
@@ -27,7 +28,12 @@ import MonitoringDashboard from './components/MonitoringDashboard/MonitoringDash
 import TeacherDashboard from './components/TeacherDashboard/TeacherDashboard'
 import StudentPracticeMode from './components/StudentPractice/StudentPracticeMode'
 
-const socket = io.connect(SOCKET_URL)
+// The socket only connects once someone is signed in, and sends the same JWT
+// the REST API uses (the server rejects unauthenticated sockets).
+const socket = io(SOCKET_URL, {
+  autoConnect: false,
+  auth: (cb) => cb({ token: getToken() })
+})
 
 const generateSessionCode = () =>
   `SESSION-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
@@ -102,6 +108,16 @@ const App = () => {
     },
     [user, location.pathname]
   )
+
+  // Connect when signed in; reconnect with the new token when the user changes
+  useEffect(() => {
+    if (user) {
+      if (socket.connected) socket.disconnect()
+      socket.connect()
+    } else if (socket.connected) {
+      socket.disconnect()
+    }
+  }, [user?._id])
 
   useEffect(() => {
     if (!user) return undefined

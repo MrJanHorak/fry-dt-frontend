@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment files (set real values in your host, e.g. Netlify/Vercel)
+.env
+.env.*
+!.env.example

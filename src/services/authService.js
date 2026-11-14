@@ -112,4 +112,58 @@ async function changePassword(id, pw) {
   }
 }
 
-export { signup, getUser, logout, login, addStudent, changePassword }
+async function postJson(path, body, { auth = false } = {}) {
+  const headers = { 'Content-Type': 'application/json' }
+  if (auth) headers.Authorization = `Bearer ${tokenService.getToken()}`
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body || {})
+  })
+  const json = await res.json().catch(() => ({}))
+  if (!res.ok || json.err) {
+    throw new Error(getErrorMessage(json, 'Something went wrong'))
+  }
+  return json
+}
+
+/** Teacher/parent: create (or replace) a student's personal QR login card. */
+async function issueLoginCard(studentProfileId) {
+  return postJson(`/students/${studentProfileId}/login-card`, {}, { auth: true })
+}
+
+/** QR card values look like "frydt:<url-encoded name>:<code>". */
+function parseLoginCard(text) {
+  if (typeof text !== 'string' || !text.startsWith('frydt:')) return null
+  const rest = text.slice('frydt:'.length)
+  const splitAt = rest.lastIndexOf(':')
+  if (splitAt <= 0) return null
+  try {
+    return {
+      name: decodeURIComponent(rest.slice(0, splitAt)),
+      code: rest.slice(splitAt + 1)
+    }
+  } catch {
+    return null
+  }
+}
+
+async function qrLogin(cardText) {
+  const card = parseLoginCard(cardText)
+  if (!card) throw new Error('That QR code is not a login card.')
+  const json = await postJson('/qr-login', card)
+  if (json.token) tokenService.setToken(json.token)
+  return { ...json, user: tokenService.getUserFromToken() }
+}
+
+export {
+  signup,
+  getUser,
+  logout,
+  login,
+  addStudent,
+  changePassword,
+  issueLoginCard,
+  qrLogin,
+  parseLoginCard
+}

@@ -1,97 +1,85 @@
 import React, { useEffect, useState } from 'react'
 import QRCode from 'react-qr-code'
 
-import CryptoJS from 'crypto-js'
-import { changePassword } from '../../services/authService'
+import { issueLoginCard } from '../../services/authService'
 
-const CreateQr = ({ user, pw }) => {
-  const encryptKey = import.meta.env.VITE_REACT_APP_ENCRYPTKEY
-  const [qrCards, setQrCards] = useState([])
+/**
+ * Printable QR login cards, one per student.
+ *
+ * Each card holds a personal, random login code created by the server.
+ * Printing new cards cancels the previous cards for those students, so a
+ * lost card can simply be re-printed.
+ */
+const CreateQr = ({ students = [] }) => {
+  const [cards, setCards] = useState([])
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const generateQRCodesAndUpdatePasswords = async () => {
-      if (!encryptKey || !pw || !user?.students?.length) {
-        setQrCards([])
-        return
-      }
+    let cancelled = false
 
-      const qrCodes = user.students.map((student) => {
-        const qrValue = [
-          CryptoJS.AES.encrypt(
-            JSON.stringify(student.name),
-            encryptKey
-          ).toString(),
-          CryptoJS.AES.encrypt(JSON.stringify(pw), encryptKey).toString()
-        ].join(',')
-
-        return (
-          <div
-            key={student._id}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              textAlign: 'center',
-              padding: 10,
-              margin: 20,
-              border: '1px solid black',
-              borderRadius: 12
-            }}
-            className="qr-card"
-          >
-            <div
-              style={{
-                height: 75,
-                backgroundColor: 'grey',
-                borderTopRightRadius: 12,
-                borderTopLeftRadius: 12,
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-              className="qr-card-header"
-            >
-              <h2>FRY Diagnosis Tool</h2>
-            </div>
-            <div style={{ padding: 20 }} className="qr-code-field">
-              <QRCode value={qrValue} />
-            </div>
-            <div
-              style={{
-                height: 75,
-                backgroundColor: 'grey',
-                borderBottomLeftRadius: 12,
-                borderBottomRightRadius: 12,
-                color: 'white',
-                fontWeight: 500,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-              className="qr-code-footer"
-            >
-              <h2>{student.name}</h2>
-            </div>
-          </div>
+    const generate = async () => {
+      setLoading(true)
+      setError('')
+      try {
+        const results = await Promise.all(
+          students.map((student) => issueLoginCard(student._id))
         )
-      })
-      setQrCards(qrCodes)
-
-      await Promise.all(
-        user.students.map((student) => changePassword(student._id, pw))
-      )
+        if (!cancelled) setCards(results)
+      } catch (err) {
+        if (!cancelled) setError(err.message)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
     }
 
-    generateQRCodesAndUpdatePasswords()
-  }, [encryptKey, pw, user])
+    if (students.length) generate()
+    else setLoading(false)
+
+    return () => {
+      cancelled = true
+    }
+  }, [students])
+
+  if (loading) return <p role="status">Creating login cards…</p>
+  if (error) return <p role="alert">{error}</p>
+  if (!cards.length) return <p>Add students first, then print their cards.</p>
 
   return (
-    <div
-      style={{ display: 'flex', flexDirection: 'row', maxWidth: '900px' }}
-      className="qr-card-page"
-    >
-      {qrCards}
+    <div className="qr-card-page">
+      <style>{`
+        .qr-card-page { display: flex; flex-wrap: wrap; gap: 16px; padding: 16px;
+          font-family: system-ui, sans-serif; }
+        .qr-card { width: 240px; border: 2px solid #222; border-radius: 12px;
+          text-align: center; break-inside: avoid; page-break-inside: avoid; }
+        .qr-card h2 { margin: 0; padding: 12px; font-size: 1.4rem; }
+        .qr-card .qr { padding: 16px; background: #fff; }
+        .qr-card .hint { font-size: 0.85rem; padding: 0 12px 12px; }
+        .print-bar { width: 100%; }
+        @media print { .print-bar { display: none; } }
+      `}</style>
+      <div className="print-bar">
+        <button type="button" onClick={() => window.print()}>
+          Print cards
+        </button>
+        <p>
+          Older cards for these students no longer work. Keep cards somewhere
+          safe, like a reading folder.
+        </p>
+      </div>
+      {cards.map((card) => (
+        <div key={card.profileId} className="qr-card">
+          <h2>{card.name}</h2>
+          <div className="qr">
+            <QRCode
+              value={card.qrValue}
+              size={180}
+              title={`Login card for ${card.name}`}
+            />
+          </div>
+          <p className="hint">Hold up to the camera on the Sign In page</p>
+        </div>
+      ))}
     </div>
   )
 }

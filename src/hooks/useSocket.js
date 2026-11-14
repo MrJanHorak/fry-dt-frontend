@@ -5,6 +5,7 @@
 
 import { useEffect, useRef, useCallback, useState } from 'react'
 import { io } from 'socket.io-client'
+import { getToken } from '../services/tokenService'
 import { SOCKET_URL } from '../config/runtime'
 
 const isSocketLike = (value) =>
@@ -35,6 +36,7 @@ const useSocket = (socketOrPath = SOCKET_URL) => {
     const socket = usingExistingSocket
       ? socketOrPath
       : io(socketOrPath, {
+          auth: (cb) => cb({ token: getToken() }),
           transports: ['websocket'],
           upgrade: true,
           rememberUpgrade: true
