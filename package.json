@@ -31,9 +31,9 @@
     "react-icons": "^4.7.1",
     "react-new-window": "^1.0.1",
     "react-qr-code": "^2.0.11",
-    "react-router-dom": "^6.6.1",
+    "react-router-dom": "^7.18.5",
     "react-select": "^5.8.0",
-    "socket.io-client": "^4.7.2"
+    "socket.io-client": "^4.8.4"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.1",
