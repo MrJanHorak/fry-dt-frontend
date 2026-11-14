@@ -136,6 +136,9 @@ const Assignments = () => {
                 >
                   {open === a._id ? 'Hide progress' : 'Show progress'}
                 </button>
+                <Link className={styles.buttonSecondary} to={`/assignments/${a._id}/print`}>
+                  🖨 Take-home packets
+                </Link>
                 {a.status === 'active' && (
                   <>
                     <button type="button" className={styles.buttonSecondary} onClick={() => setEditing(a)}>

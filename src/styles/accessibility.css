@@ -226,3 +226,25 @@ html[data-theme='high-contrast'] .status-badge {
   background: #000;
   color: #fff;
 }
+
+/* Printing: only the printable content */
+@page {
+  margin: 0.5in;
+}
+@media print {
+  .skip-link,
+  .hide-in-focus-mode,
+  .no-print,
+  .performance-widget {
+    display: none !important;
+  }
+  #root {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+}

@@ -1,0 +1,109 @@
+.packet {
+  font-family: var(--packet-font);
+  color: #111;
+  background: #fff;
+  text-align: left;
+  max-width: 8in;
+  margin: 0 auto 2rem;
+  padding: 0.5in;
+  border: 1px solid #ccc;
+  break-after: page;
+  page-break-after: always;
+}
+
+.letter {
+  font-size: 13pt;
+  line-height: 1.5;
+  break-after: page;
+  page-break-after: always;
+}
+
+.letter h2 {
+  margin-top: 0;
+}
+
+.letter li {
+  margin-bottom: 0.35rem;
+}
+
+.note {
+  border-left: 4px solid #333;
+  padding-left: 0.75rem;
+}
+
+.small {
+  font-size: 11pt;
+}
+
+.chartSection {
+  break-after: page;
+  page-break-after: always;
+}
+
+.chart {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.chart th,
+.chart td {
+  border: 2px solid #333;
+  height: 0.55in;
+  text-align: center;
+}
+
+.chartWord {
+  font-size: 20pt;
+  width: 35%;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+
+.cardsLarge {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.4in;
+  border: 2px dashed #777;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.cardsLarge .card {
+  height: 2.5in;
+}
+
+.cardWord {
+  font-size: 40pt;
+  font-weight: 700;
+}
+
+.cardsLarge .cardWord {
+  font-size: 56pt;
+}
+
+.cardName {
+  position: absolute;
+  bottom: 6px;
+  right: 10px;
+  font-size: 8pt;
+  color: #555;
+}
+
+@media print {
+  .packet {
+    border: none;
+    padding: 0;
+    margin: 0;
+    max-width: none;
+  }
+}

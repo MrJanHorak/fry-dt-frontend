@@ -111,3 +111,15 @@ describe('QR login cards', () => {
     expect(parseLoginCard('https://example.com')).toBeNull()
   })
 })
+
+describe('TakeHomePacket', () => {
+  it('prints a family letter, a chart row and a card per word', async () => {
+    const { default: TakeHomePacket } = await import('../components/TakeHomePacket/TakeHomePacket')
+    render(<TakeHomePacket studentName="Emma H" words={['said', 'were']} teacherName="Ms H" note="Great job!" />)
+    expect(screen.getByText('Dear family,')).toBeTruthy()
+    expect(screen.getByText(/Great job!/)).toBeTruthy()
+    expect(screen.getAllByText('said')).toHaveLength(3) // tip + chart + card
+    expect(screen.getAllByText('were')).toHaveLength(2) // chart + card
+    expect(screen.getByText("Emma's practice chart")).toBeTruthy()
+  })
+})

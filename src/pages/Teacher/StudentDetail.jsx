@@ -229,6 +229,9 @@ const StudentDetail = () => {
         <Link className={styles.button} to={`/students/${id}/benchmark`}>
           Start 1:1 assessment
         </Link>
+        <Link className={styles.buttonSecondary} to={`/students/${id}/print`}>
+          🖨 Take-home packet
+        </Link>
         <button
           type="button"
           className={styles.buttonSecondary}
