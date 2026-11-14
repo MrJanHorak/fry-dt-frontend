@@ -55,6 +55,14 @@ export const ACTIVITIES = {
     instruction: 'Listen to the word. Then find it.',
     skill: 'receptive'
   },
+  'say-it': {
+    mode: 'speech',
+    title: 'Say it',
+    icon: '🎤',
+    description: 'Read the word to the computer. Your voice stays on this device.',
+    instruction: 'Press the microphone, then read the word out loud.',
+    skill: 'expressive'
+  },
   'build-word': {
     mode: 'build',
     title: 'Build it',

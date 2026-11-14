@@ -11,7 +11,12 @@ import styles from './Teacher.module.css'
 const RESPONSE_MODES = [
   { value: 'self-check', label: 'Read aloud & self-check' },
   { value: 'choice', label: 'Listen & find (no speaking needed)' },
-  { value: 'build', label: 'Build the word with letter tiles' }
+  { value: 'build', label: 'Build the word with letter tiles' },
+  {
+    value: 'speech',
+    label:
+      'Say it: speech recognition ON THIS DEVICE ONLY (needs a supported browser; voice is never recorded or sent)'
+  }
 ]
 
 /** Teacher/parent editor for IEP/504-style accommodations. */
