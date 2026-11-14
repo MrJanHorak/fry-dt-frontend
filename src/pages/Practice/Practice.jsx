@@ -4,7 +4,8 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useAccessibility } from '../../contexts/AccessibilityContext'
 import { getPracticeSession, recordAttempts } from '../../services/learningService'
 import { speak, spell, stopSpeaking } from '../../utils/speech'
-import { installOnDevice, listenForWord, onDeviceStatus } from '../../utils/onDeviceSpeech'
+import { listenForWord, prepareEngine, sayItEngine } from '../../utils/onDeviceSpeech'
+import { loadVoskModel } from '../../utils/voskEngine'
 import { ACTIVITIES, letterTiles, pickChoices, playChime } from './practiceUtils'
 import styles from './Practice.module.css'
 
@@ -43,6 +44,7 @@ const Practice = () => {
   const [stats, setStats] = useState({ correct: 0, total: 0 })
   const [saveError, setSaveError] = useState('')
   const [speechStatus, setSpeechStatus] = useState('unknown')
+  const [speechEngine, setSpeechEngine] = useState(null) // 'browser' | 'vosk'
   const [speechNote, setSpeechNote] = useState('')
 
   const shownAt = useRef(0)
@@ -100,18 +102,24 @@ const Practice = () => {
   const speechAllowed = (acc.responseModes || []).includes('speech')
   useEffect(() => {
     if (!speechAllowed) return
-    onDeviceStatus().then(setSpeechStatus)
+    sayItEngine().then(({ engine, status }) => {
+      setSpeechEngine(engine)
+      setSpeechStatus(status)
+    })
   }, [speechAllowed])
 
   const setUpSpeech = async () => {
-    setSpeechNote('Downloading the speech pack. This happens once…')
-    const ok = await installOnDevice()
-    const status = await onDeviceStatus()
-    setSpeechStatus(status)
     setSpeechNote(
-      ok && status === 'available'
-        ? '“Say it” is ready on this device.'
-        : 'Sorry, “Say it” cannot be set up on this device.'
+      speechEngine === 'vosk'
+        ? 'Getting “Say it” ready (about 40 MB from your school’s server, one time only)…'
+        : 'Downloading the speech pack. This happens once…'
+    )
+    const ok = await prepareEngine(speechEngine)
+    const { engine, status } = await sayItEngine()
+    setSpeechEngine(engine)
+    setSpeechStatus(ok && engine === speechEngine ? 'available' : status)
+    setSpeechNote(
+      ok ? '“Say it” is ready on this device.' : 'Sorry, “Say it” cannot be set up on this device.'
     )
   }
 
@@ -180,6 +188,9 @@ const Practice = () => {
     setStats({ correct: 0, total: 0 })
     requeued.current = new Set()
     startedAt.current = Date.now()
+    if (activity === 'say-it' && speechEngine === 'vosk') {
+      loadVoskModel().catch(() => {}) // warm up in the background
+    }
     setPhase('playing')
     if (settings.readAloudInstructions) say(activityInfo.instruction)
   }
@@ -245,16 +256,24 @@ const Practice = () => {
   // simply checks themselves, so the machine never marks a child wrong.
   const handleSayIt = async () => {
     stopSpeaking()
-    setStep('listening')
-    setAnnouncement('Listening')
-    const result = await listenForWord(current)
+    setStep('preparing')
+    setAnnouncement('Getting ready')
+    const result = await listenForWord(current, {
+      engine: speechEngine,
+      // Other words the child might say instead help the recognizer decide
+      competitors: [...queue, ...pickChoices(current, queue, 4)],
+      onStart: () => {
+        setStep('listening')
+        setAnnouncement('Listening. Read the word now.')
+      }
+    })
     readingMs.current = Math.round(performance.now() - shownAt.current)
     if (result.matched) {
       record(true, { scoredBy: 'speech' })
       showFeedback(true)
       return
     }
-    if (result.reason === 'unavailable' || result.reason === 'not-allowed' || result.reason === 'service-not-allowed') {
+    if (['unavailable', 'not-allowed', 'service-not-allowed', 'audio-capture'].includes(result.reason)) {
       setSpeechNote('The microphone is not available. You can check yourself instead.')
     }
     setStep('check')
@@ -661,6 +680,12 @@ const Practice = () => {
               🔤 Spell it
             </button>
           </>
+        )}
+
+        {activity === 'say-it' && step === 'preparing' && (
+          <p className={styles.listening} role="status">
+            Getting ready…
+          </p>
         )}
 
         {activity === 'say-it' && step === 'listening' && (

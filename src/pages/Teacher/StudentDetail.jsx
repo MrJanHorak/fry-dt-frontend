@@ -15,7 +15,7 @@ const RESPONSE_MODES = [
   {
     value: 'speech',
     label:
-      'Say it: speech recognition ON THIS DEVICE ONLY (needs a supported browser; voice is never recorded or sent)'
+      'Say it: speech recognition ON THIS DEVICE ONLY (built-in browser recognition, or a speech pack from your school server on Chromebooks; voice is never recorded or sent)'
   }
 ]
 

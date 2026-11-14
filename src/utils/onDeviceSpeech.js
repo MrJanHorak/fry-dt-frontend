@@ -11,6 +11,11 @@
  * local recognizer and only the words it heard come back.
  */
 
+import { acceptableForms, heardWord } from './speechMatch'
+import { listenWithVosk, loadVoskModel, voskStatus } from './voskEngine'
+
+export { acceptableForms, heardWord }
+
 const LANG = 'en-US'
 
 const getCtor = () =>
@@ -69,78 +74,11 @@ export function createLocalRecognizer({ lang = LANG, maxAlternatives = 5, interi
   return recognition
 }
 
-// Words a child can say identically but a recognizer may spell differently.
-const SOUND_ALIKES = [
-  ['to', 'two', 'too', '2'],
-  ['there', 'their', "they're"],
-  ['for', 'four', 'fore', '4'],
-  ['one', 'won', '1'],
-  ['write', 'right', 'rite'],
-  ['know', 'no'],
-  ['knew', 'new'],
-  ['by', 'buy', 'bye'],
-  ['i', 'eye'],
-  ['be', 'bee'],
-  ['see', 'sea'],
-  ['would', 'wood'],
-  ['here', 'hear'],
-  ['its', "it's"],
-  ['your', "you're"],
-  ['our', 'hour'],
-  ['son', 'sun'],
-  ['eight', 'ate', '8'],
-  ['road', 'rode'],
-  ['whole', 'hole'],
-  ['made', 'maid'],
-  ['some', 'sum'],
-  ['which', 'witch'],
-  ['week', 'weak'],
-  ['sea', 'see'],
-  ['red', 'read'],
-  ['three', '3'],
-  ['five', '5'],
-  ['six', '6'],
-  ['seven', '7'],
-  ['nine', '9'],
-  ['ten', '10'],
-  ['hundred', '100']
-]
-
-const normalize = (text) =>
-  String(text || '')
-    .toLowerCase()
-    .replace(/[’`]/g, "'")
-    .replace(/[^a-z0-9' ]+/g, ' ')
-    .trim()
-
-export function acceptableForms(target) {
-  const key = normalize(target)
-  const forms = new Set([key])
-  for (const group of SOUND_ALIKES) {
-    if (group.includes(key)) group.forEach((w) => forms.add(w))
-  }
-  return forms
-}
-
 /**
- * Did any of the recognizer's guesses contain the target word
- * (or a word that sounds exactly the same)?
- */
-export function heardWord(target, transcripts = []) {
-  const forms = acceptableForms(target)
-  const multiWord = normalize(target).includes(' ')
-  return transcripts.some((t) => {
-    const text = normalize(t)
-    if (multiWord) return text.includes(normalize(target))
-    return text.split(/\s+/).some((token) => forms.has(token))
-  })
-}
-
-/**
- * Listens once for a single word.
+ * Listens once for a single word with the browser's ON-DEVICE recognizer.
  * Resolves { matched, heard: string[], reason } and never rejects.
  */
-export function listenForWord(target, { timeoutMs = 7000, onStart } = {}) {
+export function listenWithBrowser(target, { timeoutMs = 7000, onStart } = {}) {
   return new Promise((resolve) => {
     let recognition
     try {
@@ -186,4 +124,50 @@ export function listenForWord(target, { timeoutMs = 7000, onStart } = {}) {
       finish({ matched: false, heard: [], reason: 'error' })
     }
   })
+}
+
+/**
+ * Picks the engine for "Say it", most private/accurate first:
+ *  1. the browser's built-in on-device recognizer (ready now)
+ *  2. the browser's on-device recognizer after a one-time language download
+ *  3. Vosk running in this page, with the speech model from the school's
+ *     own server (works on Chromebooks and other browsers)
+ * Never a cloud service.
+ *
+ * @returns {Promise<{engine: 'browser'|'vosk'|null, status: string}>}
+ */
+export async function sayItEngine() {
+  const native = await onDeviceStatus()
+  if (native === 'available') return { engine: 'browser', status: 'available' }
+  if (native === 'downloadable' || native === 'downloading') {
+    return { engine: 'browser', status: native }
+  }
+  const vosk = await voskStatus()
+  if (vosk !== 'unsupported') return { engine: 'vosk', status: vosk }
+  return { engine: null, status: 'unsupported' }
+}
+
+/** One-time setup for the chosen engine (call from a button press). */
+export async function prepareEngine(engine) {
+  if (engine === 'browser') return installOnDevice()
+  if (engine === 'vosk') {
+    try {
+      await loadVoskModel()
+      return true
+    } catch {
+      return false
+    }
+  }
+  return false
+}
+
+/**
+ * Listens once for a word using the chosen engine.
+ * @param {string} target
+ * @param {{engine?: 'browser'|'vosk', competitors?: string[], timeoutMs?: number, onStart?: Function}} options
+ */
+export function listenForWord(target, { engine = 'browser', ...options } = {}) {
+  return engine === 'vosk'
+    ? listenWithVosk(target, options)
+    : listenWithBrowser(target, options)
 }
