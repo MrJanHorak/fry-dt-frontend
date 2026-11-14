@@ -29,6 +29,7 @@ function linksFor(user) {
       : []),
     ...(isEducator
       ? [
+          { to: '/insights', label: 'Class Insights' },
           { to: '/class', label: 'Class Progress' },
           { to: '/assignments', label: 'Assignments' },
           { to: '/teacher-dashboard', label: 'Live Testing' }
