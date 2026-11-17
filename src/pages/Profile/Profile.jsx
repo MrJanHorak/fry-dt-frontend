@@ -39,7 +39,6 @@ const Profile = ({ user }) => {
   })
   const [studentAdded, setStudentAdded] = useState(0)
   const [open, setOpen] = useState()
-  const [qr, setQr] = useState('')
 
   const added = () => {
     setStudentAdded((prevStudentAdded) => prevStudentAdded + 1)
@@ -81,11 +80,6 @@ const Profile = ({ user }) => {
     } catch (error) {
       throw error
     }
-  }
-
-  const handleQrChange = (e) => {
-    const value = e.target.value
-    setQr(value)
   }
 
   return (
@@ -139,35 +133,29 @@ const Profile = ({ user }) => {
             {(userProfile?.role === 'parent' ||
               userProfile?.role === 'teacher') && (
               <>
-                <Collapsible trigger="Create QR-Codes">
+                <Collapsible trigger="Student Login Cards (QR)">
                   <div className="generate-QrCodes qr-code-generation-form">
-                    <form className="qr-code-generation-form">
-                      <label htmlFor="generateQr">
-                        Please enter your password:
-                      </label>
-                      <input
-                        required
-                        type="password"
-                        autoComplete="off"
-                        name="generateQr"
-                        id="generateQr"
-                        onChange={handleQrChange}
-                      />
-                      <button
-                        type="submit"
-                        className="submit-button"
-                        onClick={() => {
-                          setOpen(true)
-                        }}
+                    <p>
+                      Each student gets their own QR card to sign in by holding
+                      it up to the camera. Printing new cards cancels the old
+                      ones.
+                    </p>
+                    <button
+                      type="button"
+                      className="submit-button"
+                      onClick={() => setOpen(true)}
+                      disabled={!userProfile?.students?.length}
+                    >
+                      Create login cards
+                    </button>
+                    {open && (
+                      <NewWindow
+                        title="Student login cards"
+                        onUnload={() => setOpen(false)}
                       >
-                        create
-                      </button>
-                      {open && (
-                        <NewWindow>
-                          <CreateQr user={userProfile} pw={qr} />
-                        </NewWindow>
-                      )}
-                    </form>
+                        <CreateQr students={userProfile.students} />
+                      </NewWindow>
+                    )}
                   </div>
                 </Collapsible>
                 <Collapsible

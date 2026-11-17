@@ -1,0 +1,334 @@
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+  text-align: center;
+  color: var(--text);
+}
+
+.title {
+  font-size: 2.2rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.fieldset {
+  border: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  text-align: left;
+}
+
+.fieldset legend {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.optionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.option {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 1rem;
+  border: 3px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+.option:has(input:checked) {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent);
+}
+
+.option input {
+  width: 1.4rem;
+  height: 1.4rem;
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.option > span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.optionIcon {
+  font-size: 2rem;
+}
+
+.optionHint {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.count {
+  font-size: 1.3rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.bigButton,
+.yesButton,
+.noButton {
+  min-height: 64px;
+  min-width: 160px;
+  padding: 0.75rem 2rem;
+  font: inherit;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border-radius: 18px;
+  border: 3px solid transparent;
+  cursor: pointer;
+}
+
+.bigButton {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.bigButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.yesButton {
+  background: var(--status-mastered-bg);
+  color: var(--status-mastered);
+  border-color: var(--status-mastered);
+}
+
+.noButton {
+  background: var(--status-learning-bg);
+  color: var(--status-learning);
+  border-color: var(--status-learning);
+}
+
+.secondaryButton,
+.helpButton {
+  min-height: 52px;
+  padding: 0.5rem 1.25rem;
+  font: inherit;
+  font-size: 1.15rem;
+  font-weight: 600;
+  border-radius: 14px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.secondaryLink {
+  font-size: 1.15rem;
+  color: var(--accent);
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.progressText {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.progress {
+  flex: 1;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+.instruction {
+  font-size: 1.25rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  min-height: 300px;
+  padding: 2rem 1rem;
+  border: 3px solid var(--border);
+  border-radius: 28px;
+  background: var(--surface);
+}
+
+.word {
+  margin: 0;
+  font-size: clamp(4rem, 14vw, 9rem);
+  font-weight: 700;
+  line-height: 1.1;
+  /* Keep words on one line and readable at any text size */
+  overflow-wrap: anywhere;
+}
+
+.listenButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 64px;
+  padding: 0.5rem 1.5rem;
+  font: inherit;
+  font-size: 1.4rem;
+  border-radius: 999px;
+  border: 3px solid var(--accent);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+.choice {
+  min-height: 110px;
+  font: inherit;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 700;
+  border-radius: 20px;
+  border: 3px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.choice:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.choiceAnswer,
+.choiceAnswer:disabled {
+  opacity: 1;
+  border-color: var(--status-mastered);
+  box-shadow: 0 0 0 4px var(--status-mastered);
+}
+
+.buildSlots {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.2rem;
+  height: 4rem;
+  font-size: 2.6rem;
+  font-weight: 700;
+  border-bottom: 4px solid var(--text);
+}
+
+.tiles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.tile {
+  width: 4.2rem;
+  height: 4.2rem;
+  font: inherit;
+  font-size: 2.4rem;
+  font-weight: 700;
+  border-radius: 14px;
+  border: 3px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.tile:disabled {
+  visibility: hidden;
+}
+
+.feedback {
+  min-height: 2.2rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 1rem 0;
+}
+
+.good {
+  color: var(--status-mastered);
+}
+
+.tryAgain {
+  color: var(--status-review);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.selfCheck {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.question {
+  width: 100%;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.stars {
+  font-size: 2.2rem;
+  letter-spacing: 0.15em;
+  word-break: break-all;
+}
+
+.saveNote {
+  color: var(--text-muted);
+  margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+  .bigButton,
+  .yesButton,
+  .noButton {
+    width: 100%;
+  }
+}
+
+.listening {
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 1rem 2rem;
+  border-radius: 999px;
+  border: 3px solid var(--accent);
+}

@@ -1,0 +1,362 @@
+/* Shared styles for teacher and progress pages */
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  text-align: left;
+  color: var(--text);
+}
+
+.page h1 {
+  font-size: 2rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.page h2 {
+  font-size: 1.4rem;
+  margin: 1.75rem 0 0.75rem;
+}
+
+.big {
+  font-size: 1.5rem;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-weight: 600;
+}
+
+.field input,
+.field select,
+.field textarea {
+  min-height: 44px;
+  padding: 0.4rem 0.6rem;
+  font: inherit;
+  font-weight: 400;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.fieldHint {
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.button,
+.buttonSecondary,
+.buttonDanger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.45rem 1.1rem;
+  font: inherit;
+  font-weight: 700;
+  border-radius: 10px;
+  border: 2px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.buttonSecondary {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.buttonDanger {
+  background: var(--surface);
+  color: var(--status-not-known);
+  border-color: var(--status-not-known);
+}
+
+.button:disabled,
+.buttonSecondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.card {
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem;
+  background: var(--surface);
+}
+
+.card h3 {
+  margin: 0 0 0.5rem;
+}
+
+.cardList {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.listGrid {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.meter {
+  width: 100%;
+  height: 1.2rem;
+}
+
+.wordChips {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.wordChips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+
+.chipWord {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+}
+
+.stat {
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem;
+}
+
+.statValue {
+  display: block;
+  font-size: 1.9rem;
+  font-weight: 700;
+}
+
+/* Class heatmap */
+.heatmapWrap {
+  position: relative; /* keep visually-hidden labels inside the scroll box */
+  max-width: 100%;
+  overflow: auto;
+  max-height: 70vh;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+}
+
+.heatmap {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9rem;
+}
+
+.heatmap th,
+.heatmap td {
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  padding: 0;
+  text-align: center;
+  background: var(--surface);
+}
+
+.heatmap thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 0.35rem;
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  height: 6.5rem;
+  vertical-align: bottom;
+  font-weight: 600;
+}
+
+.heatmap thead th.cornerCell,
+.heatmap thead th.sumCell {
+  writing-mode: horizontal-tb;
+  transform: none;
+  height: auto;
+  vertical-align: bottom;
+}
+
+.heatmap .cornerCell {
+  left: 0;
+  z-index: 3;
+}
+
+.heatmap tbody th {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  text-align: left;
+  padding: 0.35rem 0.6rem;
+  white-space: nowrap;
+}
+
+.heatmap tbody th a {
+  color: inherit;
+}
+
+.cell {
+  position: relative;
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  line-height: 2rem;
+  font-weight: 700;
+}
+
+.cell-mastered { background: var(--status-mastered-bg); color: var(--status-mastered); }
+.cell-review { background: var(--status-review-bg); color: var(--status-review); }
+.cell-learning { background: var(--status-learning-bg); color: var(--status-learning); }
+.cell-not-known { background: var(--status-not-known-bg); color: var(--status-not-known); }
+.cell-not-yet { background: var(--surface); color: var(--status-not-yet); }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 1rem;
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 0.45rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.checkList {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+}
+
+.checkList label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 36px;
+}
+
+.checkList input {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.fieldset {
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem 1rem 1rem;
+  margin: 0 0 1rem;
+}
+
+.fieldset legend {
+  font-weight: 700;
+  padding: 0 0.35rem;
+}
+
+.notice {
+  padding: 0.75rem 1rem;
+  border-left: 5px solid var(--accent);
+  background: var(--surface-2);
+  border-radius: 6px;
+}
+
+/* Benchmark */
+.benchWord {
+  font-size: clamp(4rem, 14vw, 9rem);
+  font-weight: 700;
+  text-align: center;
+  margin: 1rem 0;
+  min-height: 1.2em;
+}
+
+.benchActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.benchActions button {
+  min-height: 80px;
+  font-size: 1.5rem;
+}
+
+.correctBtn {
+  background: var(--status-mastered-bg) !important;
+  color: var(--status-mastered) !important;
+  border-color: var(--status-mastered) !important;
+}
+
+.incorrectBtn {
+  background: var(--status-not-known-bg) !important;
+  color: var(--status-not-known) !important;
+  border-color: var(--status-not-known) !important;
+}
+
+.kbd {
+  display: inline-block;
+  padding: 0 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.85em;
+}

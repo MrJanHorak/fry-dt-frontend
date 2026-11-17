@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useSpeechSynthesis } from 'react-speech-kit'
+import useSpeechSynthesis from '../../hooks/useSpeechSynthesis'
 
 const VoiceSettings = ({ formData, handleChange }) => {
   const text = 'Welcome to the Fry word diagnosis tool!'
@@ -9,9 +9,13 @@ const VoiceSettings = ({ formData, handleChange }) => {
   const onEnd = () => {
     // You could do something here after speaking has finished
   }
-  const { speak, cancel, speaking, supported, voices } = useSpeechSynthesis({
-    onEnd
-  })
+  const {
+    speak,
+    stop: cancel,
+    speaking,
+    supported,
+    voices
+  } = useSpeechSynthesis({ onEnd })
 
   let voice = voices[formData.voice] || 0
 
@@ -114,7 +118,7 @@ const VoiceSettings = ({ formData, handleChange }) => {
               ) : (
                 <button
                   type="button"
-                  onClick={() => speak({ text, voice, rate, pitch })}
+                  onClick={() => speak(text, { voice, rate, pitch })}
                 >
                   Speak
                 </button>

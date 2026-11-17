@@ -53,8 +53,7 @@ export default defineConfig(({ command, mode }) => {
             socket: ['socket.io-client'],
 
             // Feature chunks
-            qr: ['react-qr-code', 'react-qr-reader'],
-            speech: ['react-speech-kit'],
+            qr: ['react-qr-code', '@yudiel/react-qr-scanner'],
             ui: ['react-select', 'react-collapsible']
           },
 

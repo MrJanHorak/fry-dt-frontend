@@ -9,6 +9,7 @@ import {
 import io from 'socket.io-client'
 import './App.css'
 import { SOCKET_URL } from './config/runtime'
+import { getToken } from './services/tokenService'
 
 // Context Providers
 import { useAuth } from './contexts/AuthContext'
@@ -26,8 +27,22 @@ import Chat from './components/Chat/Chat'
 import MonitoringDashboard from './components/MonitoringDashboard/MonitoringDashboard'
 import TeacherDashboard from './components/TeacherDashboard/TeacherDashboard'
 import StudentPracticeMode from './components/StudentPractice/StudentPracticeMode'
+import Practice from './pages/Practice/Practice'
+import MyProgress from './pages/MyProgress/MyProgress'
+import AccessibilitySettings from './components/AccessibilitySettings/AccessibilitySettings'
+import ClassProgress from './pages/Teacher/ClassProgress'
+import Assignments from './pages/Teacher/Assignments'
+import StudentDetail from './pages/Teacher/StudentDetail'
+import Benchmark from './pages/Teacher/Benchmark'
+import PrintPackets from './pages/Teacher/PrintPackets'
+import Insights from './pages/Teacher/Insights'
 
-const socket = io.connect(SOCKET_URL)
+// The socket only connects once someone is signed in, and sends the same JWT
+// the REST API uses (the server rejects unauthenticated sockets).
+const socket = io(SOCKET_URL, {
+  autoConnect: false,
+  auth: (cb) => cb({ token: getToken() })
+})
 
 const generateSessionCode = () =>
   `SESSION-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
@@ -83,6 +98,8 @@ const App = () => {
   const isAdmin = Boolean(user?.isAdmin)
   const isTeacher = isAdmin || user?.role === 'teacher'
   const isStudent = user?.role === 'student'
+  // Teachers and parents both look after students
+  const isEducator = isTeacher || user?.role === 'parent'
   const canAccessTesting = isTeacher || isStudent
 
   const renderProtectedRoute = (element) =>
@@ -102,6 +119,16 @@ const App = () => {
     },
     [user, location.pathname]
   )
+
+  // Connect when signed in; reconnect with the new token when the user changes
+  useEffect(() => {
+    if (user) {
+      if (socket.connected) socket.disconnect()
+      socket.connect()
+    } else if (socket.connected) {
+      socket.disconnect()
+    }
+  }, [user?._id])
 
   useEffect(() => {
     if (!user) return undefined
@@ -209,8 +236,14 @@ const App = () => {
   return (
     <PerformanceProvider>
       <div className="App">
-        <Nav user={user} handleLogout={handleLogout} />
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
+        <div className="hide-in-focus-mode">
+          <Nav user={user} handleLogout={handleLogout} />
+        </div>
         {user && (import.meta.env.DEV || isAdmin) && <MonitoringDashboard />}
+        <main id="main-content" tabIndex={-1} style={{ outline: 'none' }}>
         <Routes>
           <Route path="/" element={<Landing user={user} />} />
           <Route
@@ -275,8 +308,47 @@ const App = () => {
             )}
           />
 
+          <Route
+            path="/practice"
+            element={renderRoleProtectedRoute(isStudent, <Practice />)}
+          />
+          <Route
+            path="/my-progress"
+            element={renderRoleProtectedRoute(isStudent, <MyProgress />)}
+          />
+          <Route path="/settings/reading" element={<AccessibilitySettings />} />
+          <Route
+            path="/insights"
+            element={renderRoleProtectedRoute(isEducator, <Insights />)}
+          />
+          <Route
+            path="/class"
+            element={renderRoleProtectedRoute(isEducator, <ClassProgress />)}
+          />
+          <Route
+            path="/assignments"
+            element={renderRoleProtectedRoute(isEducator, <Assignments />)}
+          />
+          <Route
+            path="/students/:id"
+            element={renderRoleProtectedRoute(isEducator, <StudentDetail />)}
+          />
+          <Route
+            path="/students/:id/print"
+            element={renderRoleProtectedRoute(isEducator, <PrintPackets mode="student" />)}
+          />
+          <Route
+            path="/assignments/:id/print"
+            element={renderRoleProtectedRoute(isEducator, <PrintPackets mode="assignment" />)}
+          />
+          <Route
+            path="/students/:id/benchmark"
+            element={renderRoleProtectedRoute(isEducator, <Benchmark />)}
+          />
+
           {/* <Route path='/admin' element={<Admin user={user} />} /> */}
         </Routes>
+        </main>
       </div>
     </PerformanceProvider>
   )

@@ -379,7 +379,7 @@ const StudentPracticeMode = ({ socket }) => {
           <div className={styles.levelSelector}>
             <h3>Reading Level</h3>
             <div className={styles.levelButtons}>
-              {[1, 2, 3, 4, 5].map((level) => (
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((level) => (
                 <button
                   key={level}
                   className={`${styles.levelButton} ${
