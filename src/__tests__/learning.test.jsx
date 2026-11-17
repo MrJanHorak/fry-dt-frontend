@@ -123,3 +123,23 @@ describe('TakeHomePacket', () => {
     expect(screen.getByText("Emma's practice chart")).toBeTruthy()
   })
 })
+
+describe('BarChart', () => {
+  it('renders a described chart and a data table', async () => {
+    const { default: BarChart } = await import('../components/BarChart/BarChart')
+    render(
+      <BarChart
+        title="Students who practised each day"
+        valueLabel="Students"
+        summary="Busiest day: Mon with 5 students."
+        data={[
+          { label: 'Mon Nov 9', short: 'Mon', value: 5 },
+          { label: 'Tue Nov 10', short: 'Tue', value: 3 }
+        ]}
+      />
+    )
+    expect(screen.getByRole('img', { name: /Students who practised/ })).toBeTruthy()
+    expect(screen.getByText('Tue Nov 10')).toBeTruthy()
+    expect(screen.getAllByText(/Busiest day/).length).toBeGreaterThan(0)
+  })
+})
