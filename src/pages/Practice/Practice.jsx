@@ -4,6 +4,8 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useAccessibility } from '../../contexts/AccessibilityContext'
 import { getPracticeSession, recordAttempts } from '../../services/learningService'
 import { speak, spell, stopSpeaking } from '../../utils/speech'
+import { listenForWord, prepareEngine, sayItEngine } from '../../utils/onDeviceSpeech'
+import { loadVoskModel } from '../../utils/voskEngine'
 import { ACTIVITIES, letterTiles, pickChoices, playChime } from './practiceUtils'
 import styles from './Practice.module.css'
 
@@ -41,6 +43,9 @@ const Practice = () => {
   const [choices, setChoices] = useState([])
   const [stats, setStats] = useState({ correct: 0, total: 0 })
   const [saveError, setSaveError] = useState('')
+  const [speechStatus, setSpeechStatus] = useState('unknown')
+  const [speechEngine, setSpeechEngine] = useState(null) // 'browser' | 'vosk'
+  const [speechNote, setSpeechNote] = useState('')
 
   const shownAt = useRef(0)
   const readingMs = useRef(null) // flashcards: time until "Check"
@@ -82,9 +87,41 @@ const Practice = () => {
     const fromAssignment = session?.assignment?.activities
     return Object.entries(ACTIVITIES)
       .filter(([, info]) => modes.includes(info.mode))
-      .filter(([key]) => !fromAssignment || fromAssignment.includes(key) || (key === 'flashcards' && fromAssignment.includes('read-aloud')))
+      // "Say it" only when the browser can recognise speech ON THIS DEVICE
+      .filter(([key]) => key !== 'say-it' || speechStatus === 'available')
+      .filter(
+        ([key]) =>
+          !fromAssignment ||
+          fromAssignment.includes(key) ||
+          (['flashcards', 'say-it'].includes(key) &&
+            (fromAssignment.includes('flashcards') || fromAssignment.includes('read-aloud')))
+      )
       .map(([key]) => key)
-  }, [acc.responseModes, session?.assignment])
+  }, [acc.responseModes, session?.assignment, speechStatus])
+
+  const speechAllowed = (acc.responseModes || []).includes('speech')
+  useEffect(() => {
+    if (!speechAllowed) return
+    sayItEngine().then(({ engine, status }) => {
+      setSpeechEngine(engine)
+      setSpeechStatus(status)
+    })
+  }, [speechAllowed])
+
+  const setUpSpeech = async () => {
+    setSpeechNote(
+      speechEngine === 'vosk'
+        ? 'Getting “Say it” ready (about 40 MB from your school’s server, one time only)…'
+        : 'Downloading the speech pack. This happens once…'
+    )
+    const ok = await prepareEngine(speechEngine)
+    const { engine, status } = await sayItEngine()
+    setSpeechEngine(engine)
+    setSpeechStatus(ok && engine === speechEngine ? 'available' : status)
+    setSpeechNote(
+      ok ? '“Say it” is ready on this device.' : 'Sorry, “Say it” cannot be set up on this device.'
+    )
+  }
 
   useEffect(() => {
     if (allowedActivities.length && !allowedActivities.includes(activity)) {
@@ -151,6 +188,9 @@ const Practice = () => {
     setStats({ correct: 0, total: 0 })
     requeued.current = new Set()
     startedAt.current = Date.now()
+    if (activity === 'say-it' && speechEngine === 'vosk') {
+      loadVoskModel().catch(() => {}) // warm up in the background
+    }
     setPhase('playing')
     if (settings.readAloudInstructions) say(activityInfo.instruction)
   }
@@ -166,7 +206,7 @@ const Practice = () => {
       responseMs: acc.untimed ? undefined : elapsed,
       skill: activityInfo.skill,
       context: 'practice',
-      scoredBy: activity === 'flashcards' ? 'self' : 'choice',
+      scoredBy: ['flashcards', 'say-it'].includes(activity) ? 'self' : 'choice',
       helpUsed,
       assignmentId: session?.assignment?._id,
       ...extra
@@ -209,6 +249,37 @@ const Practice = () => {
   const handleSelfAssess = (correct) => {
     record(correct)
     showFeedback(correct)
+  }
+
+  // "Say it": the computer can only CONFIRM a correct read. If it does not
+  // hear the word (children's speech is hard for recognisers), the child
+  // simply checks themselves, so the machine never marks a child wrong.
+  const handleSayIt = async () => {
+    stopSpeaking()
+    setStep('preparing')
+    setAnnouncement('Getting ready')
+    const result = await listenForWord(current, {
+      engine: speechEngine,
+      // Other words the child might say instead help the recognizer decide
+      competitors: [...queue, ...pickChoices(current, queue, 4)],
+      onStart: () => {
+        setStep('listening')
+        setAnnouncement('Listening. Read the word now.')
+      }
+    })
+    readingMs.current = Math.round(performance.now() - shownAt.current)
+    if (result.matched) {
+      record(true, { scoredBy: 'speech' })
+      showFeedback(true)
+      return
+    }
+    if (['unavailable', 'not-allowed', 'service-not-allowed', 'audio-capture'].includes(result.reason)) {
+      setSpeechNote('The microphone is not available. You can check yourself instead.')
+    }
+    setStep('check')
+    setAnnouncement("I didn't catch that. Listen, then tell me if you read it right.")
+    say(current)
+    setTimeout(() => mainButton.current?.focus(), 50)
   }
 
   const handleChoice = (choice) => {
@@ -262,7 +333,8 @@ const Practice = () => {
       if (e.target.tagName === 'INPUT' || e.altKey || e.ctrlKey || e.metaKey) return
       if (e.key === 'h' || e.key === 'H') {
         e.preventDefault()
-        activity === 'flashcards' && step === 'show' ? helpHear() : say(current)
+        if (['flashcards', 'say-it'].includes(activity) && step === 'show') helpHear()
+        else say(current)
       }
       if (activity === 'listen-find' && step === 'show' && /^[1-4]$/.test(e.key)) {
         const choice = choices[Number(e.key) - 1]
@@ -369,6 +441,23 @@ const Practice = () => {
               ))}
             </div>
           </fieldset>
+        )}
+
+        {speechAllowed && ['downloadable', 'downloading'].includes(speechStatus) && (
+          <p>
+            <button type="button" className={styles.secondaryButton} onClick={setUpSpeech}>
+              🎤 Set up “Say it” on this device
+            </button>
+            <br />
+            <span className={styles.optionHint}>
+              One-time download. Speech is recognised on this device. Your voice is never recorded or sent anywhere.
+            </span>
+          </p>
+        )}
+        {speechNote && (
+          <p role="status" className={styles.optionHint}>
+            {speechNote}
+          </p>
         )}
 
         <p className={styles.count}>
@@ -480,7 +569,7 @@ const Practice = () => {
 
       {/* The word card */}
       <section className={styles.card} aria-labelledby="instruction" aria-describedby="feedback">
-        {activity === 'flashcards' && (
+        {(activity === 'flashcards' || activity === 'say-it') && (
           <p className={styles.word} lang="en">
             {current}
           </p>
@@ -579,7 +668,33 @@ const Practice = () => {
           </>
         )}
 
-        {activity === 'flashcards' && step === 'check' && (
+        {activity === 'say-it' && step === 'show' && (
+          <>
+            <button ref={mainButton} type="button" className={styles.bigButton} onClick={handleSayIt}>
+              🎤 Say it
+            </button>
+            <button type="button" className={styles.helpButton} onClick={helpHear} aria-keyshortcuts="h">
+              🔊 Hear it
+            </button>
+            <button type="button" className={styles.helpButton} onClick={helpSpell}>
+              🔤 Spell it
+            </button>
+          </>
+        )}
+
+        {activity === 'say-it' && step === 'preparing' && (
+          <p className={styles.listening} role="status">
+            Getting ready…
+          </p>
+        )}
+
+        {activity === 'say-it' && step === 'listening' && (
+          <p className={styles.listening} role="status">
+            <span aria-hidden="true">🎤</span> Listening… read the word now
+          </p>
+        )}
+
+        {['flashcards', 'say-it'].includes(activity) && step === 'check' && (
           <div role="group" aria-labelledby="self-check-q" className={styles.selfCheck}>
             <p id="self-check-q" className={styles.question}>
               Did you read it right?
@@ -596,7 +711,7 @@ const Practice = () => {
           </div>
         )}
 
-        {activity !== 'flashcards' && step === 'show' && (
+        {['listen-find', 'build-word'].includes(activity) && step === 'show' && (
           <button type="button" className={styles.helpButton} onClick={helpSpell}>
             🔤 Spell it for me
           </button>

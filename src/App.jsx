@@ -35,6 +35,7 @@ import Assignments from './pages/Teacher/Assignments'
 import StudentDetail from './pages/Teacher/StudentDetail'
 import Benchmark from './pages/Teacher/Benchmark'
 import PrintPackets from './pages/Teacher/PrintPackets'
+import Insights from './pages/Teacher/Insights'
 
 // The socket only connects once someone is signed in, and sends the same JWT
 // the REST API uses (the server rejects unauthenticated sockets).
@@ -316,6 +317,10 @@ const App = () => {
             element={renderRoleProtectedRoute(isStudent, <MyProgress />)}
           />
           <Route path="/settings/reading" element={<AccessibilitySettings />} />
+          <Route
+            path="/insights"
+            element={renderRoleProtectedRoute(isEducator, <Insights />)}
+          />
           <Route
             path="/class"
             element={renderRoleProtectedRoute(isEducator, <ClassProgress />)}
