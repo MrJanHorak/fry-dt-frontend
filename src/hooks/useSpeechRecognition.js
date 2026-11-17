@@ -1,9 +1,15 @@
 /**
  * Custom hook for managing speech recognition
- * Provides speech-to-text functionality for sight word testing
+ * Provides speech-to-text functionality for sight word testing.
+ *
+ * PRIVACY: recognition only runs ON THE DEVICE (Web Speech API
+ * `processLocally`). If the browser cannot guarantee local processing,
+ * `supported` stays false and the microphone is never used. Children's
+ * audio is never sent to a cloud speech service.
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { createLocalRecognizer, onDeviceStatus } from '../utils/onDeviceSpeech'
 
 const useSpeechRecognition = (options = {}) => {
   const {
@@ -27,13 +33,38 @@ const useSpeechRecognition = (options = {}) => {
 
   // Initialize speech recognition
   useEffect(() => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition
+    let cancelled = false
+    let cleanup = () => {}
 
-    if (SpeechRecognition) {
+    onDeviceStatus(lang).then((status) => {
+      if (cancelled) return
+      if (status !== 'available') {
+        setSupported(false)
+        setError(
+          status === 'downloadable' || status === 'downloading'
+            ? 'On-device speech recognition needs a one-time download (turn it on in Practice).'
+            : 'On-device speech recognition is not available in this browser, so the microphone stays off.'
+        )
+        return
+      }
+
+      try {
+        recognitionRef.current = createLocalRecognizer({
+          lang,
+          maxAlternatives,
+          interimResults,
+          continuous
+        })
+      } catch (err) {
+        setSupported(false)
+        setError(err.message)
+        return
+      }
       setSupported(true)
-      recognitionRef.current = new SpeechRecognition()
+      cleanup = init()
+    })
 
+    const init = () => {
       const recognition = recognitionRef.current
 
       // Configure recognition settings
@@ -101,12 +132,13 @@ const useSpeechRecognition = (options = {}) => {
         setError('No speech was recognized')
         console.log('No speech recognized')
       }
-    } else {
-      setSupported(false)
-      setError('Speech recognition not supported in this browser')
+
+      return () => recognition.abort()
     }
 
     return () => {
+      cancelled = true
+      cleanup()
       if (recognitionRef.current) {
         recognitionRef.current.abort()
       }
