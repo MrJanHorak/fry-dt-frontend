@@ -33,7 +33,8 @@
     "react-qr-code": "^2.0.11",
     "react-router-dom": "^7.18.5",
     "react-select": "^5.8.0",
-    "socket.io-client": "^4.8.4"
+    "socket.io-client": "^4.8.4",
+    "vosk-browser": "^0.0.8"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.1",

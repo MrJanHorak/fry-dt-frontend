@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint:check
+      - name: Tests
+        run: npx vitest run
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_URL: https://api.example.invalid
+          VITE_SOCKET_URL: https://api.example.invalid
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high

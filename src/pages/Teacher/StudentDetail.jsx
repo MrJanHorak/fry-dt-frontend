@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { FRY_LISTS } from '../../data/fryWords'
-import { getProgressSummary, saveProfileSettings } from '../../services/learningService'
+import { downloadCsv, getProgressSummary, saveProfileSettings } from '../../services/learningService'
 import ProgressChart from '../../components/ProgressChart/ProgressChart'
 import StatusBadge, { STATUS_INFO, STATUS_ORDER } from '../../components/StatusBadge/StatusBadge'
 import AssignmentForm from '../../components/AssignmentForm/AssignmentForm'
@@ -15,7 +15,7 @@ const RESPONSE_MODES = [
   {
     value: 'speech',
     label:
-      'Say it: speech recognition ON THIS DEVICE ONLY (needs a supported browser; voice is never recorded or sent)'
+      'Say it: speech recognition ON THIS DEVICE ONLY (built-in browser recognition, or a speech pack from your school server on Chromebooks; voice is never recorded or sent)'
   }
 ]
 
@@ -237,6 +237,15 @@ const StudentDetail = () => {
         <Link className={styles.buttonSecondary} to={`/students/${id}/print`}>
           🖨 Take-home packet
         </Link>
+        <button
+          type="button"
+          className={styles.buttonSecondary}
+          onClick={() =>
+            downloadCsv(`/api/progress/${id}/export.csv`, 'words.csv').catch((e) => setMessage(e.message))
+          }
+        >
+          ⬇ Words CSV
+        </button>
         <button
           type="button"
           className={styles.buttonSecondary}
