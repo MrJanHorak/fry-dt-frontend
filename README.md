@@ -205,7 +205,6 @@ const qrValue = [
 npm run dev              # Start development server with HMR
 npm run build            # Production build
 npm run build:staging    # Staging environment build
-npm run build:analyze    # Build with bundle analysis
 npm run preview          # Preview production build
 
 # Testing

@@ -6,7 +6,6 @@ import { resolve } from 'path'
 export default defineConfig(({ command, mode }) => {
   const isProduction = mode === 'production'
   const isStaging = mode === 'staging'
-  const isAnalyze = process.env.ANALYZE_BUNDLE === 'true'
 
   return {
     server: {
@@ -15,24 +14,7 @@ export default defineConfig(({ command, mode }) => {
       port: parseInt(process.env.VITE_PORT) || 3001
     },
     plugins: [
-      react(),
-      // Bundle analyzer for production builds
-      ...(isAnalyze
-        ? [
-            {
-              name: 'bundle-analyzer',
-              generateBundle() {
-                if (isProduction) {
-                  import('vite-bundle-analyzer').then(
-                    ({ default: analyzer }) => {
-                      analyzer()
-                    }
-                  )
-                }
-              }
-            }
-          ]
-        : [])
+      react()
     ],
 
     // Build optimization
